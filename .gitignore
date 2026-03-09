@@ -1,0 +1,44 @@
+# Xcode
+.DS_Store
+# Build artifacts
+build/
+DerivedData/
+
+# Xcode user settings
+*.xcuserdatad
+xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+Package.resolved
+Package.pins
+
+# CocoaPods
+Pods/
+# We recommend against adding the Pods directory to your .gitignore. However,
+# you should judge for yourself, the pros and cons are mentioned at:
+# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
+
+# Carthage
+Carthage/Build/
+
+# Generated files
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Sensitive data (example, adjust as needed)
+secret-config.plist
+
+# Other
+.build/
