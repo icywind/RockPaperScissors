@@ -1,0 +1,59 @@
+import AVFoundation
+
+struct GameRoundOutcome {
+    let playerTwoMove: HandMove?
+    let resultText: String
+}
+
+struct GameController {
+    var randomMoveProvider: () -> HandMove = {
+        HandMove.allCases.randomElement() ?? .rock
+    }
+
+    func startRoundMessage(for authorizationStatus: AVAuthorizationStatus) -> String {
+        switch authorizationStatus {
+        case .denied, .restricted:
+            return "Camera access is required to recognize Player 1's move."
+        case .authorized:
+            return "Show your hand to the camera. The first detected gesture starts a 3-second timer."
+        case .notDetermined:
+            return "Waiting for camera permission. Please allow access to start the game."
+        @unknown default:
+            return "Camera status is unavailable right now."
+        }
+    }
+
+    func countdownMessage(remaining: Int) -> String {
+        "Gesture detected. Hold still — capturing in \(remaining) seconds."
+    }
+
+    func concludeRound(playerOneMove: HandMove?) -> GameRoundOutcome {
+        guard let playerOneMove else {
+            return GameRoundOutcome(
+                playerTwoMove: nil,
+                resultText: "No gesture was recognized from the frozen frame. Press Start Game to try again."
+            )
+        }
+
+        let playerTwoMove = randomMoveProvider()
+
+        if playerOneMove == playerTwoMove {
+            return GameRoundOutcome(
+                playerTwoMove: playerTwoMove,
+                resultText: "It's a tie! Both players picked \(playerOneMove.rawValue)."
+            )
+        }
+
+        if playerOneMove.beats(playerTwoMove) {
+            return GameRoundOutcome(
+                playerTwoMove: playerTwoMove,
+                resultText: "Player 1 wins with \(playerOneMove.rawValue)!"
+            )
+        }
+
+        return GameRoundOutcome(
+            playerTwoMove: playerTwoMove,
+            resultText: "Player 2 (AI) wins with \(playerTwoMove.rawValue)!"
+        )
+    }
+}

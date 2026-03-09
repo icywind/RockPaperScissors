@@ -6,14 +6,48 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		36614B412F5EB52C00F434BE /* RoundStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B3D2F5EB52C00F434BE /* RoundStateMachine.swift */; };
+		36614B4F2F5EB78200F434BE /* CameraHandPoseClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B462F5EB78200F434BE /* CameraHandPoseClassifier.swift */; };
+		36614B522F5EB78200F434BE /* GameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B492F5EB78200F434BE /* GameController.swift */; };
+		36614B532F5EB78200F434BE /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B4A2F5EB78200F434BE /* GameViewModel.swift */; };
+		36614B542F5EB78200F434BE /* HandMove.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B4B2F5EB78200F434BE /* HandMove.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		36614B332F5F2B0A00F434BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36614B172F5EA3D200F434BE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36614B1E2F5EA3D200F434BE;
+			remoteInfo = RockPaperScissors;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		36614B1F2F5EA3D200F434BE /* RockPaperScissors.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RockPaperScissors.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		36614B2D2F5F2B0A00F434BE /* RockPaperScissorsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RockPaperScissorsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		36614B3D2F5EB52C00F434BE /* RoundStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundStateMachine.swift; sourceTree = "<group>"; };
+		36614B462F5EB78200F434BE /* CameraHandPoseClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraHandPoseClassifier.swift; sourceTree = "<group>"; };
+		36614B492F5EB78200F434BE /* GameController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameController.swift; sourceTree = "<group>"; };
+		36614B4A2F5EB78200F434BE /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
+		36614B4B2F5EB78200F434BE /* HandMove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandMove.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		36614B212F5EA3D200F434BE /* RockPaperScissors */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = RockPaperScissors;
+			sourceTree = "<group>";
+		};
+		36614B2E2F5F2B0A00F434BE /* RockPaperScissorsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RockPaperScissorsTests;
+			sourceTree = "<group>";
+		};
+		36614B612F5EBE9200F434BE /* View */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,13 +60,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36614B2F2F5F2B0A00F434BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		36614B162F5EA3D200F434BE = {
 			isa = PBXGroup;
 			children = (
+				36614B682F5EBF3A00F434BE /* Controller */,
+				36614B672F5EBEA800F434BE /* Model */,
+				36614B612F5EBE9200F434BE /* View */,
+				36614B5B2F5EBE7B00F434BE /* ViewModel */,
 				36614B212F5EA3D200F434BE /* RockPaperScissors */,
+				36614B2E2F5F2B0A00F434BE /* RockPaperScissorsTests */,
 				36614B202F5EA3D200F434BE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +87,35 @@
 			isa = PBXGroup;
 			children = (
 				36614B1F2F5EA3D200F434BE /* RockPaperScissors.app */,
+				36614B2D2F5F2B0A00F434BE /* RockPaperScissorsTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		36614B5B2F5EBE7B00F434BE /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				36614B4A2F5EB78200F434BE /* GameViewModel.swift */,
+				36614B462F5EB78200F434BE /* CameraHandPoseClassifier.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		36614B672F5EBEA800F434BE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				36614B4B2F5EB78200F434BE /* HandMove.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		36614B682F5EBF3A00F434BE /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				36614B492F5EB78200F434BE /* GameController.swift */,
+				36614B3D2F5EB52C00F434BE /* RoundStateMachine.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -62,6 +135,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				36614B212F5EA3D200F434BE /* RockPaperScissors */,
+				36614B612F5EBE9200F434BE /* View */,
 			);
 			name = RockPaperScissors;
 			packageProductDependencies = (
@@ -69,6 +143,29 @@
 			productName = RockPaperScissors;
 			productReference = 36614B1F2F5EA3D200F434BE /* RockPaperScissors.app */;
 			productType = "com.apple.product-type.application";
+		};
+		36614B322F5F2B0A00F434BE /* RockPaperScissorsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36614B372F5F2B0A00F434BE /* Build configuration list for PBXNativeTarget "RockPaperScissorsTests" */;
+			buildPhases = (
+				36614B302F5F2B0A00F434BE /* Sources */,
+				36614B2F2F5F2B0A00F434BE /* Frameworks */,
+				36614B312F5F2B0A00F434BE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				36614B342F5F2B0A00F434BE /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				36614B2E2F5F2B0A00F434BE /* RockPaperScissorsTests */,
+			);
+			name = RockPaperScissorsTests;
+			packageProductDependencies = (
+			);
+			productName = RockPaperScissorsTests;
+			productReference = 36614B2D2F5F2B0A00F434BE /* RockPaperScissorsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -82,6 +179,10 @@
 				TargetAttributes = {
 					36614B1E2F5EA3D200F434BE = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					36614B322F5F2B0A00F434BE = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 36614B1E2F5EA3D200F434BE;
 					};
 				};
 			};
@@ -100,12 +201,20 @@
 			projectRoot = "";
 			targets = (
 				36614B1E2F5EA3D200F434BE /* RockPaperScissors */,
+				36614B322F5F2B0A00F434BE /* RockPaperScissorsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		36614B1D2F5EA3D200F434BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36614B312F5F2B0A00F434BE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -119,10 +228,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36614B4F2F5EB78200F434BE /* CameraHandPoseClassifier.swift in Sources */,
+				36614B522F5EB78200F434BE /* GameController.swift in Sources */,
+				36614B532F5EB78200F434BE /* GameViewModel.swift in Sources */,
+				36614B542F5EB78200F434BE /* HandMove.swift in Sources */,
+				36614B412F5EB52C00F434BE /* RoundStateMachine.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36614B302F5F2B0A00F434BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		36614B342F5F2B0A00F434BE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36614B1E2F5EA3D200F434BE /* RockPaperScissors */;
+			targetProxy = 36614B332F5F2B0A00F434BE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		36614B282F5EA3D400F434BE /* Debug */ = {
@@ -256,7 +385,7 @@
 				DEVELOPMENT_TEAM = 5C7PJ9NG5T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-					INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to recognize rock, paper, and scissors hand gestures in real time.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to recognize rock, paper, and scissors hand gestures in real time.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -290,7 +419,7 @@
 				DEVELOPMENT_TEAM = 5C7PJ9NG5T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-					INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to recognize rock, paper, and scissors hand gestures in real time.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to recognize rock, paper, and scissors hand gestures in real time.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -314,6 +443,62 @@
 			};
 			name = Release;
 		};
+		36614B352F5F2B0A00F434BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5C7PJ9NG5T;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = rcsw.RockPaperScissorsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RockPaperScissors.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RockPaperScissors";
+			};
+			name = Debug;
+		};
+		36614B362F5F2B0A00F434BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5C7PJ9NG5T;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = rcsw.RockPaperScissorsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RockPaperScissors.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RockPaperScissors";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -331,6 +516,15 @@
 			buildConfigurations = (
 				36614B2B2F5EA3D400F434BE /* Debug */,
 				36614B2C2F5EA3D400F434BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36614B372F5F2B0A00F434BE /* Build configuration list for PBXNativeTarget "RockPaperScissorsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36614B352F5F2B0A00F434BE /* Debug */,
+				36614B362F5F2B0A00F434BE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
