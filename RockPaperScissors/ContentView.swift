@@ -7,9 +7,11 @@
 
 import AVFoundation
 import Combine
+import CoreImage
 import CoreML
 import ImageIO
 import SwiftUI
+import UIKit
 import Vision
 
 enum HandMove: String, CaseIterable {
@@ -45,7 +47,7 @@ enum HandMove: String, CaseIterable {
 struct ContentView: View {
     @StateObject private var cameraClassifier = CameraHandPoseClassifier()
     @State private var player2Move: HandMove?
-    @State private var resultText = "Show rock, paper, or scissors to the camera, then tap Start Game."
+    @State private var resultText = "Tap Start Game to begin."
 
     var body: some View {
         VStack(spacing: 18) {
@@ -75,12 +77,39 @@ struct ContentView: View {
         .onDisappear {
             cameraClassifier.stopSession()
         }
+        .onChange(of: cameraClassifier.countdownRemaining) { remaining in
+            guard let remaining else { return }
+            resultText = "Gesture detected. Hold still — capturing in \(remaining) seconds."
+        }
+        .onChange(of: cameraClassifier.isRoundFrozen) { isRoundFrozen in
+            guard isRoundFrozen else { return }
+            concludeRound()
+        }
     }
 
     private func startGame() {
+        player2Move = nil
+        cameraClassifier.beginRound()
+        resultText = startRoundMessage
+    }
+
+    private var startRoundMessage: String {
+        switch cameraClassifier.authorizationStatus {
+        case .denied, .restricted:
+            return "Camera access is required to recognize Player 1's move."
+        case .authorized:
+            return "Show your hand to the camera. The first detected gesture starts a 3-second timer."
+        case .notDetermined:
+            return "Waiting for camera permission. Please allow access to start the game."
+        @unknown default:
+            return "Camera status is unavailable right now."
+        }
+    }
+
+    private func concludeRound() {
         guard let playerOne = cameraClassifier.recognizedMove else {
             player2Move = nil
-            resultText = missingMoveMessage
+            resultText = "No gesture was recognized from the frozen frame. Press Start Game to try again."
             return
         }
 
@@ -93,19 +122,6 @@ struct ContentView: View {
             resultText = "Player 1 wins with \(playerOne.rawValue)!"
         } else {
             resultText = "Player 2 (AI) wins with \(playerTwo.rawValue)!"
-        }
-    }
-
-    private var missingMoveMessage: String {
-        switch cameraClassifier.authorizationStatus {
-        case .denied, .restricted:
-            return "Camera access is required to recognize Player 1's move."
-        case .authorized:
-            return "No hand gesture detected yet. Show rock, paper, or scissors to the camera."
-        case .notDetermined:
-            return "Waiting for camera permission. Please allow access to start the game."
-        @unknown default:
-            return "Camera status is unavailable right now."
         }
     }
 
@@ -136,11 +152,34 @@ private struct PlayerCameraAreaView: View {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .fill(Color.blue.opacity(0.12))
 
-                if cameraClassifier.authorizationStatus == .authorized {
+                if let frozenFrameImage = cameraClassifier.frozenFrameImage {
+                    Image(uiImage: frozenFrameImage)
+                        .resizable()
+                        .scaledToFill()
+                } else if cameraClassifier.authorizationStatus == .authorized {
                     CameraPreviewView(session: cameraClassifier.session)
                 } else {
                     CameraStatusPlaceholder(message: cameraClassifier.cameraOverlayText)
                         .padding()
+                }
+
+                if let countdownRemaining = cameraClassifier.countdownRemaining {
+                    VStack {
+                        HStack {
+                            Spacer()
+
+                            Text("\(countdownRemaining)")
+                                .font(.headline.monospacedDigit())
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(.black.opacity(0.65))
+                                .clipShape(Capsule())
+                        }
+
+                        Spacer()
+                    }
+                    .padding(16)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -278,6 +317,10 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
     @Published private(set) var recognizedMove: HandMove?
     @Published private(set) var authorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
     @Published private(set) var cameraErrorMessage: String?
+    @Published private(set) var countdownRemaining: Int?
+    @Published private(set) var frozenFrameImage: UIImage?
+    @Published private(set) var isRoundFrozen = false
+    @Published private(set) var isRoundActive = false
 
     let session = AVCaptureSession()
 
@@ -286,13 +329,21 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
             return recognizedMove.rawValue
         }
 
+        if let countdownRemaining {
+            return "Hold still... capturing in \(countdownRemaining)s"
+        }
+
+        if isRoundFrozen {
+            return "No gesture recognized"
+        }
+
         if let cameraErrorMessage {
             return cameraErrorMessage
         }
 
         switch authorizationStatus {
         case .authorized:
-            return "Show rock, paper, or scissors"
+            return isRoundActive ? "Show rock, paper, or scissors" : "Tap Start Game to begin"
         case .notDetermined:
             return "Requesting camera access..."
         case .denied, .restricted:
@@ -309,7 +360,7 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
 
         switch authorizationStatus {
         case .authorized:
-            return "Preparing camera..."
+            return isRoundActive ? "Show your move to start the countdown." : "Tap Start Game to begin."
         case .notDetermined:
             return "Please allow camera access to recognize hand gestures."
         case .denied, .restricted:
@@ -322,12 +373,21 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
     private let sessionQueue = DispatchQueue(label: "rcsw.camera.session")
     private let videoOutputQueue = DispatchQueue(label: "rcsw.camera.video-output")
     private let handPoseRequest = VNDetectHumanHandPoseRequest()
-    private let noHandFrameThreshold = 12
+    private let ciContext = CIContext()
 
     private var classifierModel: RockPaperScissorClassifier?
+    private var analysisState: AnalysisState = .idle
+    private var shouldBeginRoundWhenAuthorized = false
     private var isSessionConfigured = false
     private var isProcessingFrame = false
-    private var framesWithoutHand = 0
+    private var freezeDeadline: Date?
+    private var countdownTimer: DispatchSourceTimer?
+
+    private enum AnalysisState {
+        case idle
+        case waitingForGesture
+        case countdown
+    }
 
     override init() {
         super.init()
@@ -350,6 +410,9 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
         switch currentStatus {
         case .authorized:
             startSession()
+            if shouldBeginRoundWhenAuthorized {
+                beginRound()
+            }
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 DispatchQueue.main.async {
@@ -358,8 +421,27 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
 
                 if granted {
                     self?.startSession()
+                    if self?.shouldBeginRoundWhenAuthorized == true {
+                        self?.beginRound()
+                    }
                 }
             }
+        case .denied, .restricted:
+            cameraErrorMessage = "Enable camera access in Settings to recognize your move."
+        @unknown default:
+            cameraErrorMessage = "Camera permission is unavailable."
+        }
+    }
+
+    func beginRound() {
+        switch authorizationStatus {
+        case .authorized:
+            shouldBeginRoundWhenAuthorized = false
+            resetRoundState()
+            startSession()
+        case .notDetermined:
+            shouldBeginRoundWhenAuthorized = true
+            requestCameraAccessIfNeeded()
         case .denied, .restricted:
             cameraErrorMessage = "Enable camera access in Settings to recognize your move."
         @unknown default:
@@ -440,8 +522,26 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
         updateCameraError(nil)
     }
 
-    private func classifyHandPose(in pixelBuffer: CVPixelBuffer) {
-        guard let classifierModel else { return }
+    private func resetRoundState() {
+        videoOutputQueue.async {
+            self.analysisState = .waitingForGesture
+            self.freezeDeadline = nil
+            self.isProcessingFrame = false
+        }
+
+        DispatchQueue.main.async {
+            self.countdownTimer?.cancel()
+            self.countdownTimer = nil
+            self.countdownRemaining = nil
+            self.recognizedMove = nil
+            self.frozenFrameImage = nil
+            self.isRoundFrozen = false
+            self.isRoundActive = true
+        }
+    }
+
+    private func predictMove(in pixelBuffer: CVPixelBuffer) -> HandMove? {
+        guard let classifierModel else { return nil }
 
         do {
             let handler = VNImageRequestHandler(
@@ -452,8 +552,7 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
             try handler.perform([handPoseRequest])
 
             guard let observation = handPoseRequest.results?.first else {
-                handleNoHandDetected()
-                return
+                return nil
             }
 
             let pose = try observation.keypointsMultiArray()
@@ -461,27 +560,74 @@ private final class CameraHandPoseClassifier: NSObject, ObservableObject {
             let confidence = prediction.labelProbabilities[prediction.label] ?? 0
 
             guard confidence >= 0.60, let move = HandMove(modelLabel: prediction.label) else {
-                handleNoHandDetected()
-                return
+                return nil
             }
 
-            framesWithoutHand = 0
-            DispatchQueue.main.async {
-                self.recognizedMove = move
-            }
+            return move
         } catch {
-            handleNoHandDetected()
+            return nil
         }
     }
 
-    private func handleNoHandDetected() {
-        framesWithoutHand += 1
-
-        guard framesWithoutHand >= noHandFrameThreshold else { return }
+    private func startCountdown() {
+        analysisState = .countdown
+        freezeDeadline = Date().addingTimeInterval(3)
 
         DispatchQueue.main.async {
-            self.recognizedMove = nil
+            self.countdownTimer?.cancel()
+
+            let timer = DispatchSource.makeTimerSource(queue: .main)
+            self.countdownRemaining = 3
+            timer.schedule(deadline: .now() + 1, repeating: 1)
+            timer.setEventHandler { [weak self] in
+                guard let self else { return }
+                guard let countdownRemaining = self.countdownRemaining else {
+                    timer.cancel()
+                    return
+                }
+
+                if countdownRemaining > 1 {
+                    self.countdownRemaining = countdownRemaining - 1
+                } else {
+                    self.countdownRemaining = nil
+                    self.countdownTimer = nil
+                    timer.cancel()
+                }
+            }
+
+            self.countdownTimer = timer
+            timer.resume()
         }
+    }
+
+    private func freezeRound(using pixelBuffer: CVPixelBuffer) {
+        analysisState = .idle
+        freezeDeadline = nil
+
+        let frozenFrameImage = makeFrozenFrameImage(from: pixelBuffer)
+        let recognizedMove = predictMove(in: pixelBuffer)
+
+        stopSession()
+
+        DispatchQueue.main.async {
+            self.countdownTimer?.cancel()
+            self.countdownTimer = nil
+            self.countdownRemaining = nil
+            self.recognizedMove = recognizedMove
+            self.frozenFrameImage = frozenFrameImage
+            self.isRoundFrozen = true
+            self.isRoundActive = false
+        }
+    }
+
+    private func makeFrozenFrameImage(from pixelBuffer: CVPixelBuffer) -> UIImage? {
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer).oriented(.leftMirrored)
+
+        guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else {
+            return nil
+        }
+
+        return UIImage(cgImage: cgImage)
     }
 
     private func updateCameraError(_ message: String?) {
@@ -497,12 +643,28 @@ extension CameraHandPoseClassifier: AVCaptureVideoDataOutputSampleBufferDelegate
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
-        guard !isProcessingFrame, let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
         }
 
+        switch analysisState {
+        case .idle:
+            return
+        case .waitingForGesture:
+            break
+        case .countdown:
+            if let freezeDeadline, Date() >= freezeDeadline {
+                freezeRound(using: pixelBuffer)
+            }
+            return
+        }
+
+        guard !isProcessingFrame else { return }
+
         isProcessingFrame = true
-        classifyHandPose(in: pixelBuffer)
+        if predictMove(in: pixelBuffer) != nil {
+            startCountdown()
+        }
         isProcessingFrame = false
     }
 }
