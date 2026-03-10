@@ -2,6 +2,7 @@ import AVFoundation
 import Combine
 import CoreImage
 import CoreML
+import Photos
 import UIKit
 import Vision
 
@@ -13,6 +14,7 @@ final class CameraHandPoseClassifier: NSObject, ObservableObject {
     @Published private(set) var frozenFrameImage: UIImage?
     @Published private(set) var isRoundFrozen = false
     @Published private(set) var isRoundActive = false
+    @Published private(set) var isFrozenImageSaved = false
 
     let session = AVCaptureSession()
 
@@ -141,6 +143,45 @@ final class CameraHandPoseClassifier: NSObject, ObservableObject {
         }
     }
 
+    func saveFrozenFrame(onCompletion: ((Bool) -> Void)? = nil) {
+        guard let image = frozenFrameImage else { return }
+
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+            switch status {
+            case .authorized, .limited:
+                PHPhotoLibrary.shared().performChanges {
+                    PHAssetChangeRequest.creationRequestForAsset(from: image)
+                } completionHandler: { success, error in
+                    DispatchQueue.main.async { [weak self] in
+                        if success {
+                            self?.isFrozenImageSaved = true
+                        } else {
+                            self?.saveError = error?.localizedDescription ?? "Failed to save image"
+                        }
+                        onCompletion?(success)
+                    }
+                }
+            case .denied, .restricted:
+                DispatchQueue.main.async { [weak self] in
+                    self?.saveError = "Photo library access is denied"
+                    onCompletion?(false)
+                }
+            case .notDetermined:
+                DispatchQueue.main.async { [weak self] in
+                    self?.saveError = "Photo library permission not determined"
+                    onCompletion?(false)
+                }
+            @unknown default:
+                DispatchQueue.main.async { [weak self] in
+                    self?.saveError = "Unknown error occurred"
+                    onCompletion?(false)
+                }
+            }
+        }
+    }
+
+    @Published var saveError: String?
+
     private func startSession() {
         sessionQueue.async { [weak self] in
             guard let self else { return }
@@ -219,6 +260,7 @@ final class CameraHandPoseClassifier: NSObject, ObservableObject {
             self.frozenFrameImage = nil
             self.isRoundFrozen = false
             self.isRoundActive = true
+            self.isFrozenImageSaved = false
         }
     }
 
