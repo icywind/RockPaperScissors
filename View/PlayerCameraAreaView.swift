@@ -21,7 +21,7 @@ struct PlayerCameraAreaView: View {
                 if let frozenFrameImage = cameraClassifier.frozenFrameImage {
                     Image(uiImage: frozenFrameImage)
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFit()
                 } else if cameraClassifier.authorizationStatus == .authorized {
                     CameraPreviewView(session: cameraClassifier.session)
                 } else {

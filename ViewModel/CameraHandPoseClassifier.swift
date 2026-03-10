@@ -278,7 +278,7 @@ final class CameraHandPoseClassifier: NSObject, ObservableObject {
     }
 
     private func makeFrozenFrameImage(from pixelBuffer: CVPixelBuffer) -> UIImage? {
-        let ciImage = CIImage(cvPixelBuffer: pixelBuffer).oriented(.leftMirrored)
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer).oriented(.up)
 
         guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else {
             return nil
