@@ -28,6 +28,17 @@ enum HandMove: String, CaseIterable {
             return "scissors"
         }
     }
+    
+    var imageName: String {
+        switch self {
+        case .rock:
+            return "rock"
+        case .paper:
+            return "paper"
+        case .scissors:
+            return "scissors"
+        }
+    }
 
     func beats(_ other: HandMove) -> Bool {
         switch (self, other) {

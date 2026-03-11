@@ -16,7 +16,11 @@ struct ContentView: View {
 
             ResultBoxView(resultText: viewModel.resultText)
 
-            AIPlayerAreaView(move: viewModel.player2Move)
+            AIPlayerAreaView(
+                move: viewModel.player2Move,
+                isShuffling: viewModel.isShuffling,
+                shufflingMove: viewModel.shufflingMove
+            )
 
             Button(action: viewModel.startGame) {
                 Text("Start Game")

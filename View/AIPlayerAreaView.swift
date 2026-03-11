@@ -2,6 +2,8 @@ import SwiftUI
 
 struct AIPlayerAreaView: View {
     let move: HandMove?
+    let isShuffling: Bool
+    let shufflingMove: HandMove?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -24,11 +26,19 @@ struct AIPlayerAreaView: View {
                     )
 
                 VStack(spacing: 10) {
-                    Image(systemName: move?.symbolName ?? "cpu")
-                        .font(.system(size: 52))
-                        .foregroundStyle(.purple)
-                    Text(move?.rawValue ?? "Waiting for game")
-                        .font(.headline)
+                    if isShuffling, let shuffleMove = shufflingMove {
+                        Image(shuffleMove.imageName)
+                            .resizable()
+                            .scaledToFit()
+                    } else if let move = move {
+                        Image(move.imageName)
+                            .resizable()
+                            .scaledToFit()
+                    } else {
+                        Image(systemName: "cpu")
+                            .font(.system(size: 52))
+                            .foregroundStyle(.purple)
+                    }
                 }
                 .padding()
             }
@@ -40,7 +50,7 @@ struct AIPlayerAreaView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .trailing)
-                Text(move?.rawValue ?? "Pending")
+                Text(move?.rawValue ?? "I already decided!")
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
@@ -49,5 +59,5 @@ struct AIPlayerAreaView: View {
 }
 
 #Preview {
-    AIPlayerAreaView(move:.paper)
+    AIPlayerAreaView(move: .paper, isShuffling: false, shufflingMove: nil)
 }

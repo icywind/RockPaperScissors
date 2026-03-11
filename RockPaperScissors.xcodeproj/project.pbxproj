@@ -77,7 +77,6 @@
 				36614B672F5EBEA800F434BE /* Model */,
 				36614B612F5EBE9200F434BE /* View */,
 				36614B5B2F5EBE7B00F434BE /* ViewModel */,
-				36614B212F5EA3D200F434BE /* RockPaperScissors */,
 				36614B2E2F5F2B0A00F434BE /* RockPaperScissorsTests */,
 				36614B202F5EA3D200F434BE /* Products */,
 			);
@@ -97,6 +96,7 @@
 			children = (
 				36614B4A2F5EB78200F434BE /* GameViewModel.swift */,
 				36614B462F5EB78200F434BE /* CameraHandPoseClassifier.swift */,
+				36614B212F5EA3D200F434BE /* RockPaperScissors */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";

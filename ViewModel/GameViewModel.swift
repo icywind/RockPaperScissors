@@ -7,12 +7,15 @@ import UIKit
 @MainActor
 final class GameViewModel: ObservableObject {
     @Published private(set) var player2Move: HandMove?
-    @Published private(set) var resultText = "Show your hand to the camera. The first detected gesture starts a 3-second timer." // "Tap Start Game to begin."
+    @Published private(set) var resultText = "Show your hand to the camera. The first detected gesture starts a 3-second timer."
+    @Published private(set) var isShuffling = false
+    @Published private(set) var shufflingMove: HandMove?
 
     let playerCameraViewModel: PlayerCameraViewModel
 
     private let gameController: GameController
     private var cancellables = Set<AnyCancellable>()
+    private var shuffleTimer: Timer?
 
     init(
         playerCameraViewModel: PlayerCameraViewModel? = nil,
@@ -33,8 +36,26 @@ final class GameViewModel: ObservableObject {
 
     func startGame() {
         player2Move = nil
+        isShuffling = true
+        shufflingMove = .allCases.randomElement()
+        startShuffleTimer()
         playerCameraViewModel.beginRound()
         resultText = gameController.startRoundMessage(for: playerCameraViewModel.authorizationStatus)
+    }
+    
+    private func startShuffleTimer() {
+        shuffleTimer?.invalidate()
+        shuffleTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.shufflingMove = HandMove.allCases.randomElement()
+            }
+        }
+    }
+    
+    private func stopShuffleTimer() {
+        shuffleTimer?.invalidate()
+        shuffleTimer = nil
+        isShuffling = false
     }
 
     private func bindCameraState() {
@@ -57,6 +78,7 @@ final class GameViewModel: ObservableObject {
     }
 
     private func concludeRound() {
+        stopShuffleTimer()
         let outcome = gameController.concludeRound(playerOneMove: playerCameraViewModel.recognizedMove)
         player2Move = outcome.playerTwoMove
         resultText = outcome.resultText
