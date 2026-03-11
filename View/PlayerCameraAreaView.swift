@@ -2,7 +2,7 @@ import SwiftUI
 import AVFoundation
 
 struct PlayerCameraAreaView: View {
-    @ObservedObject var cameraClassifier: CameraHandPoseClassifier
+    @ObservedObject var viewModel: PlayerCameraViewModel
     @State private var showSaveAlert = false
     @State private var alertMessage = ""
 
@@ -20,7 +20,7 @@ struct PlayerCameraAreaView: View {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .fill(Color.blue.opacity(0.12))
 
-                if let frozenFrameImage = cameraClassifier.frozenFrameImage {
+                if let frozenFrameImage = viewModel.frozenFrameImage {
                     Image(uiImage: frozenFrameImage)
                         .resizable()
                         .scaledToFit()
@@ -29,7 +29,7 @@ struct PlayerCameraAreaView: View {
                     VStack {
                         HStack {
                             Spacer()
-                            if (cameraClassifier.isFrozenImageSaved) {
+                            if viewModel.isFrozenImageSaved {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(.title3.weight(.medium))
                                     .foregroundStyle(.green)
@@ -39,13 +39,8 @@ struct PlayerCameraAreaView: View {
                                     .padding(16)
                             } else {
                                 Button(action: {
-                                    cameraClassifier.saveFrozenFrame() { saveSuccess in
-                                        if saveSuccess {
-                                            alertMessage = "Image saved to photo library"
-                                        } else if let error = cameraClassifier.saveError {
-                                            alertMessage = error
-                                            cameraClassifier.saveError = nil
-                                        }
+                                    viewModel.saveFrozenFrame { message in
+                                        alertMessage = message
                                         showSaveAlert = true
                                     }
                                 }) {
@@ -63,14 +58,14 @@ struct PlayerCameraAreaView: View {
                         Spacer()
                     }
 
-                } else if cameraClassifier.authorizationStatus == .authorized {
-                    CameraPreviewView(session: cameraClassifier.session)
+                } else if viewModel.authorizationStatus == .authorized {
+                    CameraPreviewView(session: viewModel.session)
                 } else {
-                    CameraStatusPlaceholder(message: cameraClassifier.cameraOverlayText)
+                    CameraStatusPlaceholder(message: viewModel.cameraOverlayText)
                         .padding()
                 }
 
-                if let countdownRemaining = cameraClassifier.countdownRemaining {
+                if let countdownRemaining = viewModel.countdownRemaining {
                     VStack {
                         HStack {
                             Spacer()
@@ -106,7 +101,7 @@ struct PlayerCameraAreaView: View {
                 Text("Player move")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text(cameraClassifier.playerMoveLabel)
+                Text(viewModel.playerMoveLabel)
                     .font(.headline)
             }
         }

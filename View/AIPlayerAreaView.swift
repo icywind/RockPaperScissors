@@ -8,9 +8,11 @@ struct AIPlayerAreaView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Player 2 (AI)")
                     .font(.title3.weight(.semibold))
+                    .frame(maxWidth: .infinity, alignment: .trailing)
                 Text("Computer opponent")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
 
             ZStack {
@@ -37,9 +39,15 @@ struct AIPlayerAreaView: View {
                 Text("AI move")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
                 Text(move?.rawValue ?? "Pending")
                     .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
     }
+}
+
+#Preview {
+    AIPlayerAreaView(move:.paper)
 }

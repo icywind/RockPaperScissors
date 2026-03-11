@@ -30,4 +30,29 @@ final class GameControllerTests: XCTestCase {
         XCTAssertEqual(outcome.playerTwoMove, .scissors)
         XCTAssertEqual(outcome.resultText, "Player 1 wins with Rock!")
     }
+
+    func testPlayerCameraViewModelPlayerMoveLabelPrefersRecognizedMove() {
+        XCTAssertEqual(
+            PlayerCameraViewModel.playerMoveLabel(
+                recognizedMove: .paper,
+                countdownRemaining: 2,
+                isRoundFrozen: true,
+                cameraErrorMessage: "Error",
+                authorizationStatus: .denied,
+                isRoundActive: false
+            ),
+            "Paper"
+        )
+    }
+
+    func testPlayerCameraViewModelOverlayTextMatchesAuthorizedPrompt() {
+        XCTAssertEqual(
+            PlayerCameraViewModel.cameraOverlayText(
+                cameraErrorMessage: nil,
+                authorizationStatus: .authorized,
+                isRoundActive: true
+            ),
+            "Show your move to start the countdown."
+        )
+    }
 }
