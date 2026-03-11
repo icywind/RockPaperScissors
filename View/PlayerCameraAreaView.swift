@@ -3,8 +3,10 @@ import AVFoundation
 
 struct PlayerCameraAreaView: View {
     @ObservedObject var viewModel: PlayerCameraViewModel
+    let player1Outcome: Player1Outcome?
     @State private var showSaveAlert = false
     @State private var alertMessage = ""
+    @State private var showConfetti = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -24,7 +26,11 @@ struct PlayerCameraAreaView: View {
                     Image(uiImage: frozenFrameImage)
                         .resizable()
                         .scaledToFit()
-
+                    // Pink tint overlay for lose state
+                    if player1Outcome == .lose {
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(Color.pink.opacity(0.4))
+                    }
                     // Save button overlay
                     VStack {
                         HStack {
@@ -83,6 +89,13 @@ struct PlayerCameraAreaView: View {
                     }
                     .padding(16)
                 }
+
+
+
+                // Confetti effect for win state
+                if showConfetti {
+                    ConfettiView(isAnimating: showConfetti)
+                }
             }
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             .overlay(
@@ -105,5 +118,89 @@ struct PlayerCameraAreaView: View {
                     .font(.headline)
             }
         }
+        .onChange(of: player1Outcome) { newValue in
+            if newValue == .win {
+                showConfetti = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    showConfetti = false
+                }
+            }
+        }
+    }
+}
+
+// Confetti effect view
+struct ConfettiView: View {
+    let isAnimating: Bool
+    @State private var particles: [ConfettiParticle] = []
+    @State private var animationProgress: CGFloat = 0
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                ForEach(particles) { particle in
+                    ConfettiPiece(particle: particle, progress: animationProgress)
+                }
+            }
+            .onAppear {
+                createParticles(in: geometry.size)
+                withAnimation(.linear(duration: 3.0)) {
+                    animationProgress = 1.0
+                }
+            }
+            .onChange(of: isAnimating) { newValue in
+                if newValue {
+                    animationProgress = 0
+                    createParticles(in: geometry.size)
+                    withAnimation(.linear(duration: 3.0)) {
+                        animationProgress = 1.0
+                    }
+                }
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func createParticles(in size: CGSize) {
+        let colors: [Color] = [.red, .blue, .green, .yellow, .orange, .purple, .pink]
+        particles = (0..<60).map { _ in
+            ConfettiParticle(
+                x: CGFloat.random(in: 0...size.width),
+                startY: CGFloat.random(in: -50...0),
+                color: colors.randomElement() ?? .red,
+                size: CGFloat.random(in: 6...12),
+                speed: CGFloat.random(in: 150...300),
+                rotation: Double.random(in: 0...360),
+                endXOffset: CGFloat.random(in: -30...30)
+            )
+        }
+    }
+}
+
+struct ConfettiParticle: Identifiable {
+    let id = UUID()
+    let x: CGFloat
+    let startY: CGFloat
+    let color: Color
+    let size: CGFloat
+    let speed: CGFloat
+    let rotation: Double
+    let endXOffset: CGFloat
+}
+
+struct ConfettiPiece: View {
+    let particle: ConfettiParticle
+    let progress: CGFloat
+
+    var body: some View {
+        let currentY = particle.startY + (progress * 400)
+        let currentX = particle.x + (particle.endXOffset * progress)
+        let currentRotation = particle.rotation + (progress * 720)
+        
+        Rectangle()
+            .fill(particle.color)
+            .frame(width: particle.size, height: particle.size * 0.6)
+            .position(x: currentX, y: currentY)
+            .rotationEffect(.degrees(currentRotation))
     }
 }

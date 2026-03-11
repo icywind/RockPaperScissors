@@ -4,12 +4,19 @@ import Foundation
 import Photos
 import UIKit
 
+enum Player1Outcome {
+    case win
+    case lose
+    case tie
+}
+
 @MainActor
 final class GameViewModel: ObservableObject {
     @Published private(set) var player2Move: HandMove?
     @Published private(set) var resultText = "Show your hand to the camera. The first detected gesture starts a 3-second timer."
     @Published private(set) var isShuffling = false
     @Published private(set) var shufflingMove: HandMove?
+    @Published private(set) var player1Outcome: Player1Outcome?
 
     let playerCameraViewModel: PlayerCameraViewModel
 
@@ -38,6 +45,7 @@ final class GameViewModel: ObservableObject {
         player2Move = nil
         isShuffling = true
         shufflingMove = .allCases.randomElement()
+        player1Outcome = nil
         startShuffleTimer()
         playerCameraViewModel.beginRound()
         resultText = gameController.startRoundMessage(for: playerCameraViewModel.authorizationStatus)
@@ -82,6 +90,15 @@ final class GameViewModel: ObservableObject {
         let outcome = gameController.concludeRound(playerOneMove: playerCameraViewModel.recognizedMove)
         player2Move = outcome.playerTwoMove
         resultText = outcome.resultText
+        
+        // Determine player 1 outcome for special effects
+        if outcome.resultText.contains("Player 1 wins") {
+            player1Outcome = .win
+        } else if outcome.resultText.contains("Player 2 (AI) wins") {
+            player1Outcome = .lose
+        } else {
+            player1Outcome = .tie
+        }
     }
 }
 

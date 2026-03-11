@@ -12,7 +12,10 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 18) {
-            PlayerCameraAreaView(viewModel: viewModel.playerCameraViewModel)
+            PlayerCameraAreaView(
+                viewModel: viewModel.playerCameraViewModel,
+                player1Outcome: viewModel.player1Outcome
+            )
 
             ResultBoxView(resultText: viewModel.resultText)
 
