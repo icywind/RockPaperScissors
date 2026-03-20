@@ -13,10 +13,11 @@ enum Player1Outcome {
 @MainActor
 final class GameViewModel: ObservableObject {
     @Published private(set) var player2Move: HandMove?
-    @Published private(set) var resultText = "Show your hand to the camera. The first detected gesture starts a 3-second timer."
+    @Published private(set) var resultText = "Choose Rock, Paper, or Scissors to start the game."
     @Published private(set) var isShuffling = false
     @Published private(set) var shufflingMove: HandMove?
     @Published private(set) var player1Outcome: Player1Outcome?
+    @Published private(set) var selectedTargetMove: HandMove?
 
     let playerCameraViewModel: PlayerCameraViewModel
 
@@ -38,17 +39,40 @@ final class GameViewModel: ObservableObject {
     }
 
     func onDisappear() {
+        stopShuffleTimer()
+        selectedTargetMove = nil
         playerCameraViewModel.stopSession()
     }
 
-    func startGame() {
+    var areMoveSelectionButtonsDisabled: Bool {
+        selectedTargetMove != nil
+    }
+
+    func startGame(with selectedMove: HandMove) {
+        guard !areMoveSelectionButtonsDisabled else { return }
+
+        let authorizationStatus = playerCameraViewModel.authorizationStatus
         player2Move = nil
-        isShuffling = true
-        shufflingMove = .allCases.randomElement()
         player1Outcome = nil
-        startShuffleTimer()
+        resultText = gameController.startRoundMessage(for: authorizationStatus)
+
+        switch authorizationStatus {
+        case .authorized, .notDetermined:
+            selectedTargetMove = selectedMove
+            isShuffling = true
+            shufflingMove = .allCases.randomElement()
+            startShuffleTimer()
+        case .denied, .restricted:
+            selectedTargetMove = nil
+            isShuffling = false
+            shufflingMove = nil
+        @unknown default:
+            selectedTargetMove = nil
+            isShuffling = false
+            shufflingMove = nil
+        }
+
         playerCameraViewModel.beginRound()
-        resultText = gameController.startRoundMessage(for: playerCameraViewModel.authorizationStatus)
     }
     
     private func startShuffleTimer() {
@@ -83,13 +107,39 @@ final class GameViewModel: ObservableObject {
                 self?.concludeRound()
             }
             .store(in: &cancellables)
+
+        playerCameraViewModel.$authorizationStatus
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                guard let self else { return }
+
+                switch status {
+                case .denied, .restricted:
+                    guard self.selectedTargetMove != nil else { return }
+                    self.stopShuffleTimer()
+                    self.selectedTargetMove = nil
+                    self.shufflingMove = nil
+                    self.resultText = self.gameController.startRoundMessage(for: status)
+                case .authorized, .notDetermined:
+                    break
+                @unknown default:
+                    break
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func concludeRound() {
         stopShuffleTimer()
-        let outcome = gameController.concludeRound(playerOneMove: playerCameraViewModel.recognizedMove)
+        let outcome = gameController.concludeRound(
+            playerOneMove: playerCameraViewModel.recognizedMove,
+            playerTwoMove: selectedTargetMove
+        )
         player2Move = outcome.playerTwoMove
         resultText = outcome.resultText
+        selectedTargetMove = nil
+        shufflingMove = nil
         
         // Determine player 1 outcome for special effects
         if outcome.resultText.contains("Player 1 wins") {
@@ -228,7 +278,7 @@ final class PlayerCameraViewModel: ObservableObject {
 
         switch authorizationStatus {
         case .authorized:
-            return isRoundActive ? "Show rock, paper, or scissors" : "Tap Start Game to begin"
+            return isRoundActive ? "Show rock, paper, or scissors" : "Choose Rock, Paper, or Scissors to begin"
         case .notDetermined:
             return "Requesting camera access..."
         case .denied, .restricted:
@@ -249,7 +299,7 @@ final class PlayerCameraViewModel: ObservableObject {
 
         switch authorizationStatus {
         case .authorized:
-            return isRoundActive ? "Show your move to start the countdown." : "Tap Start Game to begin."
+            return isRoundActive ? "Show your move to start the countdown." : "Choose Rock, Paper, or Scissors to begin."
         case .notDetermined:
             return "Please allow camera access to recognize hand gestures."
         case .denied, .restricted:

@@ -27,16 +27,32 @@ struct ContentView: View {
                     shufflingMove: viewModel.shufflingMove
                 )
 
-                Button(action: viewModel.startGame) {
-                    Text("Start Game")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.accentColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                HStack(spacing: 12) {
+                    ForEach(HandMove.allCases, id: \.rawValue) { move in
+                        Button(action: {
+                            viewModel.startGame(with: move)
+                        }) {
+                            Text(move.rawValue)
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(
+                                    viewModel.selectedTargetMove == move
+                                        ? Color.accentColor
+                                        : Color.accentColor.opacity(0.85)
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(viewModel.areMoveSelectionButtonsDisabled)
+                        .opacity(
+                            viewModel.areMoveSelectionButtonsDisabled && viewModel.selectedTargetMove != move
+                                ? 0.45
+                                : 1
+                        )
+                    }
                 }
-                .buttonStyle(.plain)
             }
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

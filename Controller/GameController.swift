@@ -27,15 +27,15 @@ struct GameController {
         "Gesture detected. Hold still — capturing in \(remaining) seconds."
     }
 
-    func concludeRound(playerOneMove: HandMove?) -> GameRoundOutcome {
+    func concludeRound(playerOneMove: HandMove?, playerTwoMove: HandMove? = nil) -> GameRoundOutcome {
         guard let playerOneMove else {
             return GameRoundOutcome(
-                playerTwoMove: nil,
-                resultText: "No gesture was recognized from the frozen frame. Press Start Game to try again."
+                playerTwoMove: playerTwoMove,
+                resultText: "No gesture was recognized from the frozen frame. Choose Rock, Paper, or Scissors to try again."
             )
         }
 
-        let playerTwoMove = randomMoveProvider()
+        let playerTwoMove = playerTwoMove ?? randomMoveProvider()
 
         if playerOneMove == playerTwoMove {
             return GameRoundOutcome(
