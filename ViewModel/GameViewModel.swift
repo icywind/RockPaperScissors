@@ -24,14 +24,18 @@ final class GameViewModel: ObservableObject {
     private let gameController: GameController
     private var cancellables = Set<AnyCancellable>()
     private var shuffleTimer: Timer?
+    private weak var rtcViewModel: AgoraViewModel?
 
     init(
         playerCameraViewModel: PlayerCameraViewModel? = nil,
-        gameController: GameController? = nil
+        gameController: GameController? = nil,
+        rtcViewModel: AgoraViewModel? = nil
     ) {
         self.playerCameraViewModel = playerCameraViewModel ?? PlayerCameraViewModel()
         self.gameController = gameController ?? GameController()
+        self.rtcViewModel = rtcViewModel
         bindCameraState()
+        setupVideoFrameForwarding()
     }
 
     func onAppear() {
@@ -150,6 +154,15 @@ final class GameViewModel: ObservableObject {
             player1Outcome = .tie
         }
     }
+    
+    private func setupVideoFrameForwarding() {
+        // Connect camera classifier's video frames to Agora for external video push (only in P2P mode)
+        if rtcViewModel != nil {
+            playerCameraViewModel.cameraClassifier.onVideoFrameCaptured = { [weak self] pixelBuffer in
+                self?.rtcViewModel?.pushVideoFrame(pixelBuffer: pixelBuffer)
+            }
+        }
+    }
 }
 
 @MainActor
@@ -186,7 +199,7 @@ final class PlayerCameraViewModel: ObservableObject {
         )
     }
 
-    private let cameraClassifier: CameraHandPoseClassifier
+    let cameraClassifier: CameraHandPoseClassifier
     private var cancellables = Set<AnyCancellable>()
 
     init(cameraClassifier: CameraHandPoseClassifier? = nil) {

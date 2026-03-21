@@ -63,6 +63,9 @@ class AgoraViewModel : NSObject, ObservableObject {
         // enable video module and set up video encoding configs
         agoraKit.enableVideo()
         agoraKit.enableAudio()
+        
+        // Enable external video source for pushing custom frames
+        agoraKit.setExternalVideoSource(true, useTexture: false, sourceType: .videoFrame)
         /*
         agoraKit.setVideoEncoderConfiguration(AgoraVideoEncoderConfiguration(size: resolution,
                                                                              frameRate: fps,
@@ -129,6 +132,18 @@ class AgoraViewModel : NSObject, ObservableObject {
             }
         }
         AgoraRtcEngineKit.destroy()
+    }
+    
+    func pushVideoFrame(pixelBuffer: CVPixelBuffer) {
+        guard isJoined, isEngineCreated else { return }
+        
+        let videoFrame = AgoraVideoFrame()
+        videoFrame.format = 12 // kCVPixelFormatType_32BGRA
+        videoFrame.textureBuf = pixelBuffer
+        videoFrame.time = CMTime(seconds: CACurrentMediaTime(), preferredTimescale: 1000)
+        videoFrame.rotation = 0
+        
+        agoraKit.pushExternalVideoFrame(videoFrame)
     }
 }
 

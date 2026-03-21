@@ -31,6 +31,9 @@ final class CameraHandPoseClassifier: NSObject {
     private var shouldBeginRoundWhenAuthorized = false
     private var isSessionConfigured = false
     private var isProcessingFrame = false
+    
+    // Callback for external video frame processing (e.g., Agora)
+    var onVideoFrameCaptured: ((CVPixelBuffer) -> Void)?
 
     var authorizationStatus: AVAuthorizationStatus {
         state.authorizationStatus
@@ -297,6 +300,9 @@ extension CameraHandPoseClassifier: AVCaptureVideoDataOutputSampleBufferDelegate
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
         }
+
+        // Pass pixelBuffer to external video frame handler (e.g., Agora)
+        onVideoFrameCaptured?(pixelBuffer)
 
         let now = Date()
 

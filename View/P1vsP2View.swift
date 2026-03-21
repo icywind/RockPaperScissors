@@ -8,11 +8,25 @@
 import SwiftUI
 
 struct P1vsP2View: View {
-    @StateObject private var gameViewModel = GameViewModel()
     @StateObject private var rtcViewModel = AgoraViewModel()
+    @StateObject private var gameViewModel: GameViewModel
     @State private var showTieEffect = false
     @State private var isLoading = true
+    
+    // MARK: - struct init
+    init() {
+        let rtcVM = AgoraViewModel()                                    // 1. create rtcVM first
+        _rtcViewModel = StateObject(wrappedValue: rtcVM)                // 2. give it to the view
+        _gameViewModel = StateObject(wrappedValue: GameViewModel(rtcViewModel: rtcVM)) // 3. share the SAME instance
+    }
 
+    /*
+     SyntaxMeaning
+        rtcViewModelThe unwrapped value (AgoraViewModel)
+       _rtcViewModelThe underlying StateObject wrapper itself
+     */
+    
+    // MARK: - View body
     var body: some View {
         ZStack {
             VStack(spacing: 18) {
