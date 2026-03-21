@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		366030142F6DED7000DECAE6 /* Agora.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366030132F6DED6500DECAE6 /* Agora.swift */; };
+		366030142F6DED7000DECAE6 /* AgoraRtcViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366030132F6DED6500DECAE6 /* AgoraRtcViewModel.swift */; };
 		366030182F6DF35900DECAE6 /* TokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366030172F6DF35200DECAE6 /* TokenService.swift */; };
 		366030332F6DF57500DECAE6 /* RtcBasic in Frameworks */ = {isa = PBXBuildFile; productRef = 366030322F6DF57500DECAE6 /* RtcBasic */; };
 		36614B412F5EB52C00F434BE /* RoundStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B3D2F5EB52C00F434BE /* RoundStateMachine.swift */; };
@@ -28,7 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		366030132F6DED6500DECAE6 /* Agora.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agora.swift; sourceTree = "<group>"; };
+		366030132F6DED6500DECAE6 /* AgoraRtcViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgoraRtcViewModel.swift; sourceTree = "<group>"; };
 		366030172F6DF35200DECAE6 /* TokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenService.swift; sourceTree = "<group>"; };
 		36614B1F2F5EA3D200F434BE /* RockPaperScissors.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RockPaperScissors.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36614B2D2F5F2B0A00F434BE /* RockPaperScissorsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RockPaperScissorsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,7 +108,7 @@
 		36614B5B2F5EBE7B00F434BE /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				366030132F6DED6500DECAE6 /* Agora.swift */,
+				366030132F6DED6500DECAE6 /* AgoraRtcViewModel.swift */,
 				36614B4A2F5EB78200F434BE /* GameViewModel.swift */,
 				36614B462F5EB78200F434BE /* CameraHandPoseClassifier.swift */,
 				36614B212F5EA3D200F434BE /* RockPaperScissors */,
@@ -248,7 +248,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				366030142F6DED7000DECAE6 /* Agora.swift in Sources */,
+				366030142F6DED7000DECAE6 /* AgoraRtcViewModel.swift in Sources */,
 				36614B4F2F5EB78200F434BE /* CameraHandPoseClassifier.swift in Sources */,
 				36614B522F5EB78200F434BE /* GameController.swift in Sources */,
 				36614B532F5EB78200F434BE /* GameViewModel.swift in Sources */,

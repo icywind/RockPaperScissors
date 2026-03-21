@@ -13,6 +13,8 @@ struct P1vsP2View: View {
     @State private var showTieEffect = false
     @State private var isLoading = true
     
+    @State private var remoteUIView = UIView()
+    
     // MARK: - struct init
     init() {
         let rtcVM = AgoraViewModel()                                    // 1. create rtcVM first
@@ -37,11 +39,20 @@ struct P1vsP2View: View {
 
                 ResultBoxView(resultText: gameViewModel.resultText)
 
-                AIPlayerAreaView(
-                    move: gameViewModel.player2Move,
-                    isShuffling: gameViewModel.isShuffling,
-                    shufflingMove: gameViewModel.shufflingMove
-                )
+                HStack(spacing: 10) {
+                    // Remote video view
+                    VideoContainerView(uiView: remoteUIView)
+                        .background(Color.black)
+                        .cornerRadius(8)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 220)
+                    
+                    AIPlayerAreaView(
+                        move: gameViewModel.player2Move,
+                        isShuffling: gameViewModel.isShuffling,
+                        shufflingMove: gameViewModel.shufflingMove
+                    )
+                }
             }
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -52,7 +63,7 @@ struct P1vsP2View: View {
         .onAppear {
             Task {
                 isLoading = true
-                rtcViewModel.onAppear()
+                rtcViewModel.onAppear(remoteView: remoteUIView)
                 try await Task.sleep(for: .seconds(0.5))
                 gameViewModel.onAppear()
                 isLoading = false

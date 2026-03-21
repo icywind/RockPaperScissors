@@ -23,23 +23,20 @@ class AgoraViewModel : NSObject, ObservableObject {
     
     private var agoraKit: AgoraRtcEngineKit!
     
-    private var localView: VideoUIView?
     private var remoteView: VideoUIView?
     
-    func onAppear() {
+    func onAppear(remoteView : UIView?) {
         let appId = "3df5beb6c72340639f5b214c59f763c6"
         let configs: [String: Any] = [
             "channelName": "rockgame",
             "tokenServerURL":"https://agora-token-server-lz2y.onrender.com"
         ]
-        setupRTC(appId: appId, configs: configs, localView: UIView(), remoteView: UIView())
+        setupRTC(appId: appId, configs: configs, remoteView:remoteView)
     }
     
     func setupRTC(appId: String,
                     configs: [String: Any],
-                  localView: VideoUIView,
-                  remoteView: VideoUIView) {
-        self.localView = localView
+                  remoteView: VideoUIView?) {
         self.remoteView = remoteView
         // set up agora instance when view loaded
         let config = AgoraRtcEngineConfig()
@@ -73,7 +70,6 @@ class AgoraViewModel : NSObject, ObservableObject {
                                                                              orientationMode: orientation, mirrorMode: .auto))
          */
         
-        setupCanvasView(view: localView)
         
         // Set audio route to speaker
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
@@ -87,6 +83,7 @@ class AgoraViewModel : NSObject, ObservableObject {
         let option = AgoraRtcChannelMediaOptions()
         option.publishCameraTrack = true
         option.publishMicrophoneTrack = true
+        option.autoSubscribeVideo = true
         option.clientRoleType = .broadcaster
         
         isEngineCreated = true
@@ -110,18 +107,6 @@ class AgoraViewModel : NSObject, ObservableObject {
         }
     }
     
-    private func setupCanvasView(view: UIView?) {
-        // set up local video to render your local camera preview
-        let videoCanvas = AgoraRtcVideoCanvas()
-        videoCanvas.uid = 0
-        // the view to be binded
-        videoCanvas.view = view
-        videoCanvas.renderMode = .hidden
-        agoraKit.setupLocalVideo(videoCanvas)
-        // you have to call startPreview to see local video
-        agoraKit.startPreview()
-    }
-    
     func onDestory() {
         agoraKit.disableAudio()
         agoraKit.disableVideo()
@@ -143,7 +128,7 @@ class AgoraViewModel : NSObject, ObservableObject {
         videoFrame.time = CMTime(seconds: CACurrentMediaTime(), preferredTimescale: 1000)
         videoFrame.rotation = 0
         
-        agoraKit.pushExternalVideoFrame(videoFrame)
+        agoraKit.pushExternalVideoFrame(videoFrame, videoTrackId: 0)
     }
 }
 
