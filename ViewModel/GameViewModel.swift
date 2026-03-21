@@ -78,7 +78,7 @@ final class GameViewModel: ObservableObject {
     private func startShuffleTimer() {
         shuffleTimer?.invalidate()
         shuffleTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 self?.shufflingMove = HandMove.allCases.randomElement()
             }
         }

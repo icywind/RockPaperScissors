@@ -130,6 +130,7 @@ final class CameraHandPoseClassifier: NSObject {
             }
 
             guard self.isSessionConfigured, !self.session.isRunning else { return }
+            print("Session Start running....")
             self.session.startRunning()
         }
     }
@@ -262,7 +263,7 @@ final class CameraHandPoseClassifier: NSObject {
         guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else {
             return nil
         }
-
+        print("makeFrozenImage...........")
         return UIImage(cgImage: cgImage)
     }
 

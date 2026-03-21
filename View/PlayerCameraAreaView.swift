@@ -13,9 +13,11 @@ struct PlayerCameraAreaView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Player 1")
                     .font(.title3.weight(.semibold))
+                    .frame(maxWidth: .infinity, alignment: .trailing)
                 Text("Front camera hand gesture recognition")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
 
             ZStack {

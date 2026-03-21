@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		366030142F6DED7000DECAE6 /* Agora.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366030132F6DED6500DECAE6 /* Agora.swift */; };
+		366030182F6DF35900DECAE6 /* TokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366030172F6DF35200DECAE6 /* TokenService.swift */; };
+		366030332F6DF57500DECAE6 /* RtcBasic in Frameworks */ = {isa = PBXBuildFile; productRef = 366030322F6DF57500DECAE6 /* RtcBasic */; };
 		36614B412F5EB52C00F434BE /* RoundStateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B3D2F5EB52C00F434BE /* RoundStateMachine.swift */; };
 		36614B4F2F5EB78200F434BE /* CameraHandPoseClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B462F5EB78200F434BE /* CameraHandPoseClassifier.swift */; };
 		36614B522F5EB78200F434BE /* GameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36614B492F5EB78200F434BE /* GameController.swift */; };
@@ -25,6 +28,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		366030132F6DED6500DECAE6 /* Agora.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agora.swift; sourceTree = "<group>"; };
+		366030172F6DF35200DECAE6 /* TokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenService.swift; sourceTree = "<group>"; };
 		36614B1F2F5EA3D200F434BE /* RockPaperScissors.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RockPaperScissors.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36614B2D2F5F2B0A00F434BE /* RockPaperScissorsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RockPaperScissorsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		36614B3D2F5EB52C00F434BE /* RoundStateMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundStateMachine.swift; sourceTree = "<group>"; };
@@ -57,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				366030332F6DF57500DECAE6 /* RtcBasic in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +76,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		366030312F6DF57500DECAE6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		36614B162F5EA3D200F434BE = {
 			isa = PBXGroup;
 			children = (
@@ -78,6 +91,7 @@
 				36614B612F5EBE9200F434BE /* View */,
 				36614B5B2F5EBE7B00F434BE /* ViewModel */,
 				36614B2E2F5F2B0A00F434BE /* RockPaperScissorsTests */,
+				366030312F6DF57500DECAE6 /* Frameworks */,
 				36614B202F5EA3D200F434BE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -94,6 +108,7 @@
 		36614B5B2F5EBE7B00F434BE /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				366030132F6DED6500DECAE6 /* Agora.swift */,
 				36614B4A2F5EB78200F434BE /* GameViewModel.swift */,
 				36614B462F5EB78200F434BE /* CameraHandPoseClassifier.swift */,
 				36614B212F5EA3D200F434BE /* RockPaperScissors */,
@@ -112,6 +127,7 @@
 		36614B682F5EBF3A00F434BE /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				366030172F6DF35200DECAE6 /* TokenService.swift */,
 				36614B492F5EB78200F434BE /* GameController.swift */,
 				36614B3D2F5EB52C00F434BE /* RoundStateMachine.swift */,
 			);
@@ -139,6 +155,7 @@
 			);
 			name = RockPaperScissors;
 			packageProductDependencies = (
+				366030322F6DF57500DECAE6 /* RtcBasic */,
 			);
 			productName = RockPaperScissors;
 			productReference = 36614B1F2F5EA3D200F434BE /* RockPaperScissors.app */;
@@ -195,6 +212,9 @@
 			);
 			mainGroup = 36614B162F5EA3D200F434BE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				366030122F6DED3D00DECAE6 /* XCRemoteSwiftPackageReference "AgoraRtcEngine_iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 36614B202F5EA3D200F434BE /* Products */;
 			projectDirPath = "";
@@ -228,11 +248,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				366030142F6DED7000DECAE6 /* Agora.swift in Sources */,
 				36614B4F2F5EB78200F434BE /* CameraHandPoseClassifier.swift in Sources */,
 				36614B522F5EB78200F434BE /* GameController.swift in Sources */,
 				36614B532F5EB78200F434BE /* GameViewModel.swift in Sources */,
 				36614B542F5EB78200F434BE /* HandMove.swift in Sources */,
 				36614B412F5EB52C00F434BE /* RoundStateMachine.swift in Sources */,
+				366030182F6DF35900DECAE6 /* TokenService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,7 +407,9 @@
 				DEVELOPMENT_TEAM = 5C7PJ9NG5T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Use bluetooth audio input/output";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to recognize rock, paper, and scissors hand gestures in real time.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Voice chat";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Adding new photo";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -420,7 +444,9 @@
 				DEVELOPMENT_TEAM = 5C7PJ9NG5T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Use bluetooth audio input/output";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to recognize rock, paper, and scissors hand gestures in real time.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Voice chat";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Adding new photo";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -532,6 +558,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		366030122F6DED3D00DECAE6 /* XCRemoteSwiftPackageReference "AgoraRtcEngine_iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AgoraIO/AgoraRtcEngine_iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.6.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		366030322F6DF57500DECAE6 /* RtcBasic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 366030122F6DED3D00DECAE6 /* XCRemoteSwiftPackageReference "AgoraRtcEngine_iOS" */;
+			productName = RtcBasic;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 36614B172F5EA3D200F434BE /* Project object */;
 }

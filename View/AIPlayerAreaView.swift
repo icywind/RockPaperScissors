@@ -45,15 +45,15 @@ struct AIPlayerAreaView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 220)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("AI move")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                Text(move?.rawValue ?? "I already decided!")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
+//            VStack(alignment: .leading, spacing: 4) {
+//                Text("AI move")
+//                    .font(.caption)
+//                    .foregroundStyle(.secondary)
+//                    .frame(maxWidth: .infinity, alignment: .trailing)
+//                Text(move?.rawValue ?? "I already decided!")
+//                    .font(.headline)
+//                    .frame(maxWidth: .infinity, alignment: .trailing)
+//            }
         }
     }
 }
