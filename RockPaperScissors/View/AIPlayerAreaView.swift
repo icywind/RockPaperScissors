@@ -1,4 +1,5 @@
 import SwiftUI
+let petName = "bear"
 
 struct AIPlayerAreaView: View {
     let move: HandMove?
@@ -17,11 +18,11 @@ struct AIPlayerAreaView: View {
 
                 VStack(spacing: 10) {
                     if isShuffling, let shuffleMove = shufflingMove {
-                        Image(shuffleMove.imageName)
+                        Image("\(petName)-\(shuffleMove.imageName)")
                             .resizable()
                             .scaledToFit()
                     } else if let move = move {
-                        Image(move.imageName)
+                        Image("\(petName)-\(move.imageName)")
                             .resizable()
                             .scaledToFit()
                     } else {

@@ -21,7 +21,7 @@ struct P1vsP2View: View {
         self.roomName = roomName
         let rtcVM = AgoraViewModel(channelName: roomName)               // 1. create rtcVM first with roomName
         _rtcViewModel = StateObject(wrappedValue: rtcVM)                // 2. give it to the view
-        _gameViewModel = StateObject(wrappedValue: GameViewModel(rtcViewModel: rtcVM)) // 3. share the SAME instance
+        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, rtcViewModel: rtcVM)) // 3. share the SAME instance
     }
 
     /*

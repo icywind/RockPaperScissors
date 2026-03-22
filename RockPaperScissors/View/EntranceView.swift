@@ -11,6 +11,7 @@ struct EntranceView: View {
     @AppStorage("roomName") private var roomName: String = ""
     @State private var showInvalidRoomAlert = false
     @State private var navigateToAI = false
+    @State private var navigateToBear = false
     @State private var navigateToP2 = false
     
     private var isRoomNameValid: Bool {
@@ -76,6 +77,31 @@ struct EntranceView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
                     
+                    // Bear vs Player Button
+                    Button {
+                        roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if isRoomNameValid {
+                            navigateToBear = true
+                        } else {
+                            showInvalidRoomAlert = true
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "teddybear.fill")
+                                .font(.title2)
+                            Text("vs")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Image(systemName: "person.fill")
+                                .font(.title2)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(Color.accentColor.opacity(0.7))
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    
                     // Player vs Player Button
                     Button {
                         roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -115,6 +141,9 @@ struct EntranceView: View {
             }
             .navigationDestination(isPresented: $navigateToAI) {
                 P1vsAIView(roomName: roomName)
+            }
+            .navigationDestination(isPresented: $navigateToBear) {
+                BvsP1View(roomName: roomName)
             }
             .navigationDestination(isPresented: $navigateToP2) {
                 P1vsP2View(roomName: roomName)

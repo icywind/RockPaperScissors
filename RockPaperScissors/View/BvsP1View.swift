@@ -1,16 +1,28 @@
 //
-//  P1vsAIView.swift
+//  BvsP1View.swift
 //  RockPaperScissors
 //
-//  Created by Rick Cheng on 3/8/26.
+//  Created by Rick Cheng on 3/21/26.
 //
 
 import SwiftUI
 
-struct P1vsAIView: View {
+struct BvsP1View: View {
     let roomName: String
-    @StateObject private var gameViewModel = GameViewModel(player1Type: .human)
+    @StateObject private var rtcViewModel: AgoraViewModel
+    @StateObject private var gameViewModel: GameViewModel
     @State private var showTieEffect = false
+    @State private var isLoading = true
+    
+    @State private var remoteUIView = UIView()
+    
+    // MARK: - struct init
+    init(roomName: String) {
+        self.roomName = roomName
+        let rtcVM = AgoraViewModel(channelName: roomName)               // 1. create rtcVM first with roomName
+        _rtcViewModel = StateObject(wrappedValue: rtcVM)                // 2. give it to the view
+        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, rtcViewModel: rtcVM)) // 3. share the SAME instance
+    }
 
     var body: some View {
         ZStack {
@@ -22,9 +34,16 @@ struct P1vsAIView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, 4)
                 
-                PlayerCameraAreaView(
-                    viewModel: gameViewModel.playerCameraViewModel,
-                    player1Outcome: gameViewModel.player1Outcome
+                Player2ContainerView(
+                    player2Name: "Player 1",
+                    player2Description: "Remote user",
+                    subView:
+                            // Remote video view
+                            VideoContainerView(uiView: remoteUIView)
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 220)
                 )
 
                 ResultBoxView(resultText: gameViewModel.resultText)
@@ -69,15 +88,33 @@ struct P1vsAIView: View {
             TieEffectView(isShowing: showTieEffect)
         }
         .onAppear {
-            gameViewModel.onAppear()
+            Task {
+                isLoading = true
+                rtcViewModel.onAppear(remoteView: remoteUIView)
+                try await Task.sleep(for: .seconds(0.5))
+                gameViewModel.onAppear()
+                isLoading = false
+            }
         }
-        .onDisappear(perform: gameViewModel.onDisappear)
+        .onDisappear{
+            gameViewModel.onDisappear()
+            rtcViewModel.onDestory()
+        }
         .onChange(of: gameViewModel.player1Outcome) { newValue in
             showTieEffect = (newValue == .tie)
+        }
+        .overlay {
+            if isLoading {
+                ZStack {
+                    Color.black.opacity(0.3)
+                    ProgressView("Loading...")
+                        .tint(.white)
+                }
+            }
         }
     }
 }
 
 #Preview {
-    P1vsAIView(roomName: "preview-room")
+    BvsP1View(roomName: "preview-room")
 }

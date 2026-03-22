@@ -20,6 +20,7 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var selectedTargetMove: HandMove?
 
     let playerCameraViewModel: PlayerCameraViewModel
+    let p1Type: PlayerType = .buttonpusher
 
     private let gameController: GameController
     private var cancellables = Set<AnyCancellable>()
@@ -27,12 +28,13 @@ final class GameViewModel: ObservableObject {
     private weak var rtcViewModel: AgoraViewModel?
 
     init(
+        player1Type p1Type: PlayerType,
         playerCameraViewModel: PlayerCameraViewModel? = nil,
         gameController: GameController? = nil,
         rtcViewModel: AgoraViewModel? = nil
     ) {
         self.playerCameraViewModel = playerCameraViewModel ?? PlayerCameraViewModel()
-        self.gameController = gameController ?? GameController()
+        self.gameController = gameController ?? GameController( playerOneType: p1Type)
         self.rtcViewModel = rtcViewModel
         bindCameraState()
         setupVideoFrameForwarding()

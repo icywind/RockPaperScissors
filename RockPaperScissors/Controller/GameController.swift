@@ -5,7 +5,15 @@ struct GameRoundOutcome {
     let resultText: String
 }
 
+enum PlayerType {
+    case human
+    case computer
+    case buttonpusher
+}
+
 struct GameController {
+    let playerOneType: PlayerType
+    
     var randomMoveProvider: () -> HandMove = {
         HandMove.allCases.randomElement() ?? .rock
     }
@@ -15,7 +23,10 @@ struct GameController {
         case .denied, .restricted:
             return "Camera access is required to recognize Player 1's move."
         case .authorized:
-            return "Show your hand to the camera. The first detected gesture starts a 3-second timer."
+            if playerOneType == .human {
+               return "Show your hand to the camera. The first detected gesture starts a 3-second timer."
+            }
+            return "Press Paper, Rock or Scissor button to Start!"
         case .notDetermined:
             return "Waiting for camera permission. Please allow access to start the game."
         @unknown default:
