@@ -19,9 +19,9 @@ struct BvsP1View: View {
     // MARK: - struct init
     init(roomName: String) {
         self.roomName = roomName
-        let rtcVM = AgoraViewModel(channelName: roomName)               // 1. create rtcVM first with roomName
-        _rtcViewModel = StateObject(wrappedValue: rtcVM)                // 2. give it to the view
-        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, rtcViewModel: rtcVM)) // 3. share the SAME instance
+        let rtcVM = AgoraViewModel(channelName: roomName)
+        _rtcViewModel = StateObject(wrappedValue: rtcVM)
+        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, rtcViewModel: rtcVM))
     }
 
     var body: some View {
@@ -38,12 +38,11 @@ struct BvsP1View: View {
                     player2Name: "Player 1",
                     player2Description: "Remote user",
                     subView:
-                            // Remote video view
-                            VideoContainerView(uiView: remoteUIView)
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 220)
+                        VideoContainerView(uiView: remoteUIView)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 220)
                 )
 
                 ResultBoxView(resultText: gameViewModel.resultText)
@@ -59,17 +58,16 @@ struct BvsP1View: View {
                         Button(action: {
                             gameViewModel.startGame(with: move)
                         }) {
-                            Text(move.rawValue)
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                            Image(bearImageName(for: move))
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 80, height: 80)
                                 .background(
                                     gameViewModel.selectedTargetMove == move
                                         ? Color.accentColor
                                         : Color.accentColor.opacity(0.85)
                                 )
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                .clipShape(Circle())
                         }
                         .buttonStyle(.plain)
                         .disabled(gameViewModel.areMoveSelectionButtonsDisabled)
@@ -96,7 +94,7 @@ struct BvsP1View: View {
                 isLoading = false
             }
         }
-        .onDisappear{
+        .onDisappear {
             gameViewModel.onDisappear()
             rtcViewModel.onDestory()
         }
@@ -112,6 +110,17 @@ struct BvsP1View: View {
                 }
             }
         }
+    }
+}
+
+private func bearImageName(for move: HandMove) -> String {
+    switch move {
+    case .rock:
+        return "bear-rock"
+    case .paper:
+        return "bear-paper"
+    case .scissors:
+        return "bear-scissors"
     }
 }
 
