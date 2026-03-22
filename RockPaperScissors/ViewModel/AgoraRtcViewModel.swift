@@ -27,6 +27,12 @@ class AgoraViewModel : NSObject, ObservableObject {
     
     private var channelName: String
     
+    private var activeRemoteUserUid: UInt? = nil
+    
+    private var streamId: Int = 0
+    
+    var simulatorVideoTimer: Timer?
+    
     init(channelName: String) {
         self.channelName = channelName.isEmpty ? "rockgame" : channelName
         super.init()
@@ -44,6 +50,11 @@ class AgoraViewModel : NSObject, ObservableObject {
             "tokenServerURL":"https://agora-token-server-lz2y.onrender.com"
         ]
         setupRTC(appId: appId, configs: configs, remoteView:remoteView)
+        
+        // Start simulator video if running on simulator
+        #if targetEnvironment(simulator)
+        startSimulatorVideo()
+        #endif
     }
     
     func setupRTC(appId: String,
@@ -120,6 +131,10 @@ class AgoraViewModel : NSObject, ObservableObject {
     }
     
     func onDestory() {
+        #if targetEnvironment(simulator)
+        stopSimulatorVideo()
+        #endif
+        
         agoraKit.disableAudio()
         agoraKit.disableVideo()
         if isJoined {
@@ -141,6 +156,25 @@ class AgoraViewModel : NSObject, ObservableObject {
         videoFrame.rotation = 0
         
         agoraKit.pushExternalVideoFrame(videoFrame, videoTrackId: 0)
+    }
+    
+    func sendMessage(message : String) {
+        // create the data stream
+        // Each user can create up to five data streams during the lifecycle of the agoraKit
+        let config = AgoraDataStreamConfig()
+        var result: Int32 = 0
+        if streamId == 0 {
+            result = agoraKit.createDataStream(&streamId, config: config)
+            if result != 0 {
+                print( "create data stream failed, error: \(result)")
+            }
+        }
+        
+        let sendResult = agoraKit.sendStreamMessage(streamId,
+                                                    data: Data(message.utf8))
+        if sendResult != 0 {
+            print("send message failed, error: \(sendResult)")
+        }
     }
 }
 
@@ -179,6 +213,17 @@ extension AgoraViewModel : AgoraRtcEngineDelegate {
     /// @param uid uid of remote joined user
     /// @param elapsed time elapse since current sdk instance join the channel in ms
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
+        // Check if there's already an active remote user
+        if let existingUid = activeRemoteUserUid {
+            message = ("dropped user \(uid), remote user \(existingUid) is still active")
+            print(message)
+            // Drop the new user by not setting up their video
+            return
+        }
+        
+        // Set this user as the active remote user
+        activeRemoteUserUid = uid
+        
         message = ("remote user join: \(uid) \(elapsed)ms")
         print(message)
         // Only one remote video view is available for this
@@ -190,6 +235,8 @@ extension AgoraViewModel : AgoraRtcEngineDelegate {
         videoCanvas.view = remoteView
         videoCanvas.renderMode = .hidden
         agoraKit.setupRemoteVideo(videoCanvas)
+        
+        sendMessage(message: "Hello \(uid)")
     }
     
     /// callback when a remote user is leaving the channel, note audience in live broadcast mode will NOT trigger this event
@@ -200,6 +247,11 @@ extension AgoraViewModel : AgoraRtcEngineDelegate {
         message = ("remote user left: \(uid) reason \(reason)")
         print(message)
         
+        // Clear the active remote user if this was the active one
+        if activeRemoteUserUid == uid {
+            activeRemoteUserUid = nil
+        }
+        
         // to unlink your view from sdk, so that your view reference will be released
         // note the video will stay at its last frame, to completely remove it
         // you will need to remove the EAGL sublayer from your binded view
@@ -209,5 +261,11 @@ extension AgoraViewModel : AgoraRtcEngineDelegate {
         videoCanvas.view = nil
         videoCanvas.renderMode = .hidden
         agoraKit.setupRemoteVideo(videoCanvas)
+    }
+    
+    func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
+        message = String.init(data: data, encoding: .utf8) ?? ""
+        message = "receiveStreamMessageFromUid: \(uid) \(message)"
+        print(message)
     }
 }
