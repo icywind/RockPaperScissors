@@ -25,16 +25,10 @@ struct BvsP1View: View {
     }
 
     var body: some View {
-        ZStack {
-            VStack(spacing: 18) {
-                // Room Name Label
-                Text("Room: \(roomName)")
-                    .font(.headline)
-                    .foregroundStyle(Color.yellow)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 4)
-                
-                Player2ContainerView(
+        NavigationStack {
+            ZStack {
+                VStack(spacing: 18) {
+                    Player2ContainerView(
                     player2Name: "Player 1",
                     player2Description: "Remote user",
                     subView:
@@ -77,15 +71,15 @@ struct BvsP1View: View {
                                 : 1
                         )
                     }
+                    }
                 }
+                .padding(20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .background(Color(.systemGroupedBackground))
+                
+                TieEffectView(isShowing: showTieEffect)
             }
-            .padding(20)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(Color(.systemGroupedBackground))
-            
-            TieEffectView(isShowing: showTieEffect)
-        }
-        .onAppear {
+            .onAppear {
             Task {
                 isLoading = true
                 rtcViewModel.onAppear(remoteView: remoteUIView)
@@ -107,6 +101,14 @@ struct BvsP1View: View {
                     Color.black.opacity(0.3)
                     ProgressView("Loading...")
                         .tint(.white)
+                }
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Room: \(roomName)")
+                        .font(.subheadline)
+                        .foregroundStyle(Color.yellow)
                 }
             }
         }

@@ -47,6 +47,7 @@ struct TieEffectView: View {
     }
     
     private func resetAnimation() {
+        print("resetting. previous opacity = \(opacity)")
         opacity = 0
         scale = 2.0
     }

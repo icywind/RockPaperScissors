@@ -3,6 +3,7 @@ import Combine
 import Foundation
 import Photos
 import UIKit
+import SwiftUI
 
 enum Player1Outcome {
     case win
@@ -26,12 +27,13 @@ final class GameViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var shuffleTimer: Timer?
     private weak var rtcViewModel: AgoraViewModel?
-
+    private var audioPlayer: AVAudioPlayer?
+    
     init(
         player1Type p1Type: PlayerType,
         playerCameraViewModel: PlayerCameraViewModel? = nil,
         gameController: GameController? = nil,
-        rtcViewModel: AgoraViewModel? = nil
+        rtcViewModel: AgoraViewModel? = nil,
     ) {
         self.playerCameraViewModel = playerCameraViewModel ?? PlayerCameraViewModel()
         self.gameController = gameController ?? GameController( playerOneType: p1Type)
@@ -46,6 +48,7 @@ final class GameViewModel: ObservableObject {
 
     func onDisappear() {
         stopShuffleTimer()
+        stopAudio()
         selectedTargetMove = nil
         playerCameraViewModel.stopSession()
     }
@@ -88,12 +91,14 @@ final class GameViewModel: ObservableObject {
                 self?.shufflingMove = HandMove.allCases.randomElement()
             }
         }
+        playAudio()
     }
     
     private func stopShuffleTimer() {
         shuffleTimer?.invalidate()
         shuffleTimer = nil
         isShuffling = false
+        stopAudio()
     }
 
     private func bindCameraState() {
@@ -136,6 +141,35 @@ final class GameViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    private func playAudio() {
+        guard Settings.shared.isSoundEnabled else { return }
+        
+        guard let url = Bundle.main.url(forResource: "rsp", withExtension: "mp3") else {
+            print("Could not find rsp.mp3")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.numberOfLoops = -1 // Loop indefinitely
+            audioPlayer?.play()
+        } catch {
+            print("Could not play audio: \(error)")
+        }
+    }
+    
+    func updateSoundSetting(_ enabled: Bool) {
+        Settings.shared.isSoundEnabled = enabled
+        if !enabled {
+            stopAudio()
+        }
+    }
+    
+    private func stopAudio() {
+        audioPlayer?.stop()
+        audioPlayer = nil
+    }
+    
     private func concludeRound() {
         stopShuffleTimer()
         let outcome = gameController.concludeRound(
