@@ -77,7 +77,10 @@ struct BvsP1View: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(Color(.systemGroupedBackground))
                 
-                TieEffectView(isShowing: showTieEffect)
+                TextEffectView(showText:gameViewModel.player1Outcome?.rawValue ?? "", isShowing: showTieEffect) {
+                    showTieEffect = false
+                    gameViewModel.resetPlayer1Outcome()
+                }
             }
             .onAppear {
             Task {

@@ -5,10 +5,10 @@ import Photos
 import UIKit
 import SwiftUI
 
-enum Player1Outcome {
-    case win
-    case lose
-    case tie
+enum Player1Outcome: String {
+    case win = "WINNER!"
+    case lose = "LOSER!"
+    case tie = "TIE!"
 }
 
 @MainActor
@@ -159,10 +159,13 @@ final class GameViewModel: ObservableObject {
     }
     
     func updateSoundSetting(_ enabled: Bool) {
-        Settings.shared.isSoundEnabled = enabled
         if !enabled {
             stopAudio()
         }
+    }
+    
+    func resetPlayer1Outcome() {
+        player1Outcome = nil
     }
     
     private func stopAudio() {

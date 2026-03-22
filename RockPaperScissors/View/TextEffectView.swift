@@ -1,7 +1,9 @@
 import SwiftUI
 
-struct TieEffectView: View {
+struct TextEffectView: View {
+    let showText: String
     let isShowing: Bool
+    var onDismiss: (() -> Void)? = nil
     
     @State private var opacity: Double = 0
     @State private var scale: CGFloat = 2.0
@@ -12,8 +14,8 @@ struct TieEffectView: View {
                 Color.black.opacity(0.5)
                     .ignoresSafeArea()
                 
-                Text("TIE!")
-                    .font(.system(size: 120, weight: .bold))
+                Text(showText)
+                    .font(.system(size: 80, weight: .bold))
                     .foregroundStyle(.white)
                     .scaleEffect(scale)
                     .opacity(opacity)
@@ -44,6 +46,10 @@ struct TieEffectView: View {
                 scale = 0.5
             }
         }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            onDismiss?()
+        }
     }
     
     private func resetAnimation() {
@@ -54,6 +60,6 @@ struct TieEffectView: View {
 }
 
 #Preview {
-    TieEffectView(isShowing: true)
+    TextEffectView(showText: "WINNER!", isShowing: true)
 }
 

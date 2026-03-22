@@ -266,7 +266,6 @@ final class CameraHandPoseClassifier: NSObject {
         guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else {
             return nil
         }
-        print("makeFrozenImage...........")
         return UIImage(cgImage: cgImage)
     }
 
