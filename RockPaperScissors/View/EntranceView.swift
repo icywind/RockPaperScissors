@@ -102,7 +102,7 @@ struct EntranceView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
                     
-                    // Player vs Player Button
+                    // Player vs Bear Button
                     Button {
                         roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
                         if isRoomNameValid {
@@ -117,7 +117,7 @@ struct EntranceView: View {
                             Text("vs")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Image(systemName: "person.fill")
+                            Image(systemName: "teddybear.fill")
                                 .font(.title2)
                         }
                         .frame(maxWidth: .infinity)
@@ -146,7 +146,7 @@ struct EntranceView: View {
                 BvsP1View(roomName: roomName)
             }
             .navigationDestination(isPresented: $navigateToP2) {
-                P1vsP2View(roomName: roomName)
+                P1vsBView(roomName: roomName)
             }
         }
     }

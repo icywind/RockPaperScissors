@@ -9,10 +9,12 @@ import UIKit
 
 #if targetEnvironment(simulator)
 
+let PlaceHolderImageName = "bear-head"
+
 extension AgoraViewModel {
     func startSimulatorVideo() {
-        guard let image = UIImage(named: "cat-head") else {
-            print("Failed to load cat-head.png")
+        guard let image = UIImage(named: PlaceHolderImageName) else {
+            print("Failed to load \(PlaceHolderImageName) image")
             return
         }
         

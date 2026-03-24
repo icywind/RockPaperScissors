@@ -16,7 +16,7 @@ struct P1vsAIView: View {
     
     init(roomName: String) {
         self.roomName = roomName
-        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human))
+        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, player2Type: .computer))
     }
 
     var body: some View {

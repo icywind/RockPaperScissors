@@ -5,14 +5,16 @@ struct GameRoundOutcome {
     let resultText: String
 }
 
-enum PlayerType {
-    case human
-    case computer
-    case buttonpusher
+enum PlayerType : Int, Codable {
+    case human = 0
+    case computer = 1
+    case buttonpusher = 2
+    
 }
 
 struct GameController {
     let playerOneType: PlayerType
+    let playerTwoType: PlayerType
     
     var randomMoveProvider: () -> HandMove = {
         HandMove.allCases.randomElement() ?? .rock

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct P1vsP2View: View {
+struct P1vsBView: View {
     let roomName: String
     @StateObject private var rtcViewModel: AgoraViewModel
     @StateObject private var gameViewModel: GameViewModel
@@ -21,7 +21,7 @@ struct P1vsP2View: View {
         self.roomName = roomName
         let rtcVM = AgoraViewModel(channelName: roomName)
         _rtcViewModel = StateObject(wrappedValue: rtcVM)
-        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, rtcViewModel: rtcVM))
+        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, player2Type: .buttonpusher, rtcViewModel: rtcVM))
     }
     
     // MARK: - View body
@@ -102,5 +102,5 @@ struct P1vsP2View: View {
 }
 
 #Preview {
-    P1vsP2View(roomName: "preview-room")
+    P1vsBView(roomName: "preview-room")
 }

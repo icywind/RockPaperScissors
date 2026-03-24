@@ -158,6 +158,29 @@ class AgoraViewModel : NSObject, ObservableObject {
         agoraKit.pushExternalVideoFrame(videoFrame, videoTrackId: 0)
     }
     
+    func sendMessage(message : NetworkMessage) {
+        let encoder = JSONEncoder()
+        let json = try? encoder.encode(message)
+        guard let json else { return }
+        
+        // create the data stream
+        // Each user can create up to five data streams during the lifecycle of the agoraKit
+        let config = AgoraDataStreamConfig()
+        var result: Int32 = 0
+        if streamId == 0 {
+            result = agoraKit.createDataStream(&streamId, config: config)
+            if result != 0 {
+                print( "create data stream failed, error: \(result)")
+            }
+        }
+        
+        let sendResult = agoraKit.sendStreamMessage(streamId,
+                                                    data: json)
+        if sendResult != 0 {
+            print("send message failed, error: \(sendResult)")
+        }
+    }
+    
     func sendMessage(message : String) {
         // create the data stream
         // Each user can create up to five data streams during the lifecycle of the agoraKit
@@ -260,6 +283,7 @@ extension AgoraViewModel : AgoraRtcEngineDelegate {
         // the view to be binded
         videoCanvas.view = nil
         videoCanvas.renderMode = .hidden
+        activeRemoteUserUid = nil
         agoraKit.setupRemoteVideo(videoCanvas)
     }
     

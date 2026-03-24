@@ -11,17 +11,22 @@ enum Player1Outcome: String {
     case tie = "TIE!"
 }
 
+enum ViewInstruction: String {
+    case buttonStartGame = "Choose Rock, Paper, or Scissors to start the game."
+    case computerStartGame = "Tap the Player 2 area to start the game"
+    case waitingForPlayer2 = "Waiting for Player 2 to start the game"
+}
+
 @MainActor
 final class GameViewModel: ObservableObject {
     @Published private(set) var player2Move: HandMove?
-    @Published private(set) var resultText = "Choose Rock, Paper, or Scissors to start the game."
+    @Published private(set) var resultText = ""
     @Published private(set) var isShuffling = false
     @Published private(set) var shufflingMove: HandMove?
     @Published private(set) var player1Outcome: Player1Outcome?
     @Published private(set) var selectedTargetMove: HandMove?
 
     let playerCameraViewModel: PlayerCameraViewModel
-    let p1Type: PlayerType = .buttonpusher
 
     private let gameController: GameController
     private var cancellables = Set<AnyCancellable>()
@@ -31,17 +36,34 @@ final class GameViewModel: ObservableObject {
     
     init(
         player1Type p1Type: PlayerType,
+        player2Type p2Type: PlayerType,
         playerCameraViewModel: PlayerCameraViewModel? = nil,
         gameController: GameController? = nil,
         rtcViewModel: AgoraViewModel? = nil,
     ) {
         self.playerCameraViewModel = playerCameraViewModel ?? PlayerCameraViewModel()
-        self.gameController = gameController ?? GameController( playerOneType: p1Type)
+        self.gameController = gameController ?? GameController( playerOneType: p1Type, playerTwoType: p2Type)
         self.rtcViewModel = rtcViewModel
+        setUpInitialInstruction(player1Type: p1Type, player2Type: p2Type)
         bindCameraState()
         setupVideoFrameForwarding()
     }
-
+    
+    private func setUpInitialInstruction( player1Type p1Type: PlayerType,
+                                          player2Type p2Type: PlayerType) {
+        if p1Type == .human  {
+            if p2Type == .buttonpusher {
+                resultText = ViewInstruction.waitingForPlayer2.rawValue
+            } else if p2Type == .computer {
+                resultText = ViewInstruction.computerStartGame.rawValue
+            }
+        } else if p1Type == .buttonpusher {
+            resultText = ViewInstruction.buttonStartGame.rawValue
+        } else {
+            resultText = "under construction"
+        }
+    }
+    
     func onAppear() {
         playerCameraViewModel.requestCameraAccessIfNeeded()
     }

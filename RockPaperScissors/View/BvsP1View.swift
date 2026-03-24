@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+/// Bear vs Human play
+///   Bear only presses the buttons to send move
 struct BvsP1View: View {
     let roomName: String
     @StateObject private var rtcViewModel: AgoraViewModel
@@ -21,7 +23,7 @@ struct BvsP1View: View {
         self.roomName = roomName
         let rtcVM = AgoraViewModel(channelName: roomName)
         _rtcViewModel = StateObject(wrappedValue: rtcVM)
-        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, rtcViewModel: rtcVM))
+        _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .buttonpusher, player2Type: .human, rtcViewModel: rtcVM))
     }
 
     var body: some View {
@@ -51,6 +53,12 @@ struct BvsP1View: View {
                     ForEach(HandMove.allCases, id: \.rawValue) { move in
                         Button(action: {
                             gameViewModel.startGame(with: move)
+                            let msg = NetworkMessage(
+                                requiredP1Mode: .human,
+                                remoteP2Mode: .buttonpusher,
+                                remoteP2Move: move
+                            )
+                            rtcViewModel.sendMessage(message: msg)
                         }) {
                             Image(bearImageName(for: move))
                                 .resizable()
