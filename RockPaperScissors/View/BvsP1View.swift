@@ -91,14 +91,39 @@ struct BvsP1View: View {
                 }
             }
             .onAppear {
-            Task {
-                isLoading = true
-                rtcViewModel.onAppear(remoteView: remoteUIView)
-                try await Task.sleep(for: .seconds(0.5))
-                gameViewModel.onAppear()
-                isLoading = false
+                Task {
+                    isLoading = true
+                    rtcViewModel.onAppear(remoteView: remoteUIView)
+                    try await Task.sleep(for: .seconds(0.5))
+                    gameViewModel.onAppear()
+                    isLoading = false
+                }
+                // Set up network message handler to receive Player1's move
+                rtcViewModel.onNetworkMessageReceived = { message in
+                    // In BvsP1View, we receive the Player1's move back
+                    // Determine the game result using the remote player's move
+                    print("Received Player1's move: \(message.remoteP2Move)")
+                    
+                    // Get the local player's (Bear/Player 2) move from the game view model
+                    guard let localMove = gameViewModel.selectedTargetMove else {
+                        print("No local move selected yet")
+                        return
+                    }
+                    
+                    // Determine the winner using GameController
+                    let gameController = GameController(playerOneType: .buttonpusher, playerTwoType: .human)
+                    let outcome = gameController.concludeRound(
+                        playerOneMove: message.remoteP2Move,
+                        playerTwoMove: localMove
+                    )
+                    
+                    // Update the game view model with the result
+                    gameViewModel.updateResultFromNetwork(
+                        player2Move: outcome.playerTwoMove,
+                        resultText: outcome.resultText
+                    )
+                }
             }
-        }
         .onDisappear {
             gameViewModel.onDisappear()
             rtcViewModel.onDestory()

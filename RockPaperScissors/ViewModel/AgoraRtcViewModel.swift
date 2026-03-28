@@ -33,6 +33,9 @@ class AgoraViewModel : NSObject, ObservableObject {
     
     var simulatorVideoTimer: Timer?
     
+    // Callback for handling received NetworkMessage
+    var onNetworkMessageReceived: ((NetworkMessage) -> Void)?
+    
     init(channelName: String) {
         self.channelName = channelName.isEmpty ? "rockgame" : channelName
         super.init()
@@ -142,8 +145,10 @@ class AgoraViewModel : NSObject, ObservableObject {
             agoraKit.leaveChannel { (stats) -> Void in
                 print ("left channel, duration: \(stats.duration)")
             }
+            isJoined = false
         }
         AgoraRtcEngineKit.destroy()
+        print("Agora engine destroyed!")
     }
     
     func pushVideoFrame(pixelBuffer: CVPixelBuffer) {
@@ -172,6 +177,8 @@ class AgoraViewModel : NSObject, ObservableObject {
             if result != 0 {
                 print( "create data stream failed, error: \(result)")
             }
+        } else {
+            print("================ datastream id:", streamId)
         }
         
         let sendResult = agoraKit.sendStreamMessage(streamId,
@@ -236,6 +243,7 @@ extension AgoraViewModel : AgoraRtcEngineDelegate {
     /// @param uid uid of remote joined user
     /// @param elapsed time elapse since current sdk instance join the channel in ms
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int) {
+        message = String(format:"remote user join: \(uid) \(elapsed)ms active:%d\n", activeRemoteUserUid ?? 0)
         // Check if there's already an active remote user
         if let existingUid = activeRemoteUserUid {
             message = ("dropped user \(uid), remote user \(existingUid) is still active")
@@ -247,7 +255,6 @@ extension AgoraViewModel : AgoraRtcEngineDelegate {
         // Set this user as the active remote user
         activeRemoteUserUid = uid
         
-        message = ("remote user join: \(uid) \(elapsed)ms")
         print(message)
         // Only one remote video view is available for this
         // tutorial. Here we check if there exists a surface
@@ -285,11 +292,21 @@ extension AgoraViewModel : AgoraRtcEngineDelegate {
         videoCanvas.renderMode = .hidden
         activeRemoteUserUid = nil
         agoraKit.setupRemoteVideo(videoCanvas)
+        
+        streamId = 0
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
-        message = String.init(data: data, encoding: .utf8) ?? ""
-        message = "receiveStreamMessageFromUid: \(uid) \(message)"
+        let text = String.init(data: data, encoding: .utf8) ?? ""
+        message = "receiveStreamMessageFromUid: \(uid) \(text)"
         print(message)
+        
+        if (uid == activeRemoteUserUid) {
+            if let msg = try? JSONDecoder().decode(NetworkMessage.self, from: data) {
+                print("msg.move: \(msg.remoteP2Move)")
+                // Call the callback to handle the received message
+                onNetworkMessageReceived?(msg)
+            }
+        }
     }
 }

@@ -6,15 +6,26 @@ struct GameRoundOutcome {
 }
 
 enum PlayerType : Int, Codable {
-    case human = 0
-    case computer = 1
-    case buttonpusher = 2
+    case any = 0
+    case human = 1
+    case computer = 2
+    case buttonpusher = 3
     
+}
+
+enum GameState : Int {
+    case Init = 0
+    case WaitingForP2 = 1
+    case WaitingForGesture = 2
+    case DeterminingWinner = 4
+    case GameOver = 5
 }
 
 struct GameController {
     let playerOneType: PlayerType
     let playerTwoType: PlayerType
+    
+    var gameState : GameState = .Init
     
     var randomMoveProvider: () -> HandMove = {
         HandMove.allCases.randomElement() ?? .rock

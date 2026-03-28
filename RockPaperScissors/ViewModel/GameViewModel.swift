@@ -111,6 +111,8 @@ final class GameViewModel: ObservableObject {
         shuffleTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 self?.shufflingMove = HandMove.allCases.randomElement()
+                //let shf = self?.isShuffling ?? false
+                //print("shuffling:\(shf) ShufflingMove = \(String(describing: self?.shufflingMove))")
             }
         }
         playAudio()
@@ -214,6 +216,11 @@ final class GameViewModel: ObservableObject {
         } else {
             player1Outcome = .tie
         }
+        
+        // Send Player1's move back to remote player in network mode
+        if rtcViewModel != nil {
+            sendPlayer1MoveBack()
+        }
     }
     
     private func setupVideoFrameForwarding() {
@@ -222,6 +229,87 @@ final class GameViewModel: ObservableObject {
             playerCameraViewModel.cameraClassifier.onVideoFrameCaptured = { [weak self] pixelBuffer in
                 self?.rtcViewModel?.pushVideoFrame(pixelBuffer: pixelBuffer)
             }
+        }
+    }
+    
+    // MARK: - Network Gameplay
+    
+    func handleNetworkMessage(_ message: NetworkMessage) {
+        // Verify that Player1 is human (local player)
+        guard message.requiredP1Mode == .human else {
+            print("Received message but Player1 is not human: \(message.requiredP1Mode)")
+            return
+        }
+        
+        // Store the remote player's move
+        let remoteMove = message.remoteP2Move
+        
+        // Start the game with the remote player's move as the target
+        startGameFromNetwork(with: remoteMove)
+    }
+    
+    private func startGameFromNetwork(with remoteMove: HandMove) {
+       // guard !areMoveSelectionButtonsDisabled else { return }
+        print("startGameFromNetwork move=\(remoteMove)")
+        
+        let authorizationStatus = playerCameraViewModel.authorizationStatus
+        // player2Move = remoteMove
+        player1Outcome = nil
+        resultText = gameController.startRoundMessage(for: authorizationStatus)
+        isShuffling = true
+        selectedTargetMove = remoteMove
+        shufflingMove = .allCases.randomElement()
+        startShuffleTimer()
+
+// TODO
+/*   Maybe we can remove the following switch statement
+        switch authorizationStatus {
+        case .authorized, .notDetermined:
+
+        case .denied, .restricted:
+            selectedTargetMove = nil
+            shufflingMove = nil
+        @unknown default:
+            selectedTargetMove = nil
+            shufflingMove = nil
+        }
+        */
+        
+        playerCameraViewModel.beginRound()
+    }
+    
+    private func sendPlayer1MoveBack() {
+        guard let player1Move = playerCameraViewModel.recognizedMove else {
+            print("No Player1 move to send back")
+            return
+        }
+        
+        let responseMessage = NetworkMessage(
+            requiredP1Mode: .human,
+            remoteP2Mode: .buttonpusher,
+            remoteP2Move: player1Move
+        )
+        
+        rtcViewModel?.sendMessage(message: responseMessage)
+        print("Sent Player1 move back: \(player1Move)")
+    }
+    
+    // MARK: - Network Result Handling
+    
+    func updateResultFromNetwork(player2Move: HandMove?, resultText: String) {
+        stopShuffleTimer()
+        self.player2Move = player2Move
+        self.resultText = resultText
+        selectedTargetMove = nil
+        shufflingMove = nil
+        
+        // Determine player 1 outcome for special effects
+        if resultText.contains("Player 1 wins") {
+            player1Outcome = .win
+        } else if resultText.contains("Player 2") && resultText.contains("wins") {
+            player1Outcome = .lose
+        } else if resultText.contains("tie") {
+            player1Outcome = .tie
         }
     }
 }

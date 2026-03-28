@@ -34,8 +34,10 @@ struct P1vsBView: View {
                         player1Outcome: gameViewModel.player1Outcome
                     )
                     
-                    ResultBoxView(resultText: gameViewModel.resultText)
-                    
+                    //ResultBoxView(resultText: gameViewModel.resultText)
+                    ResultBoxView(resultText: "\(gameViewModel.isShuffling ? "Shuffling..." : "Waiting for Player 2")")
+                    ResultBoxView(resultText: "\(rtcViewModel.message ?? "")")  
+
                     Player2ContainerView(
                         player2Name: "Player 2",
                         player2Description: "Remote user",
@@ -72,6 +74,12 @@ struct P1vsBView: View {
                     try await Task.sleep(for: .seconds(0.5))
                     gameViewModel.onAppear()
                     isLoading = false
+                }
+                // Set up network message handler
+                rtcViewModel.onNetworkMessageReceived = { message in
+                    // Handle the network message from Player2
+                    // This will start shuffling in AIPlayerAreaView
+                    gameViewModel.handleNetworkMessage(message)
                 }
             }
             .onDisappear {

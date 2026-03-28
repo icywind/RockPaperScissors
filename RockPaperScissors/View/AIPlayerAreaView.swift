@@ -41,5 +41,18 @@ struct AIPlayerAreaView: View {
 }
 
 #Preview {
-    AIPlayerAreaView(move: .paper, isShuffling: false, shufflingMove: nil)
+    // AIPlayerAreaView(move: .paper, isShuffling: false, shufflingMove: nil)
+    HStack(spacing: 10) {
+        VideoContainerView(uiView: UIView())
+            .background(Color.white)
+            .cornerRadius(8)
+            .frame(maxWidth: .infinity)
+            .frame(height: 220)
+        
+        AIPlayerAreaView(
+            move: .paper,
+            isShuffling: true,
+            shufflingMove: .paper
+        )
+    }
 }
