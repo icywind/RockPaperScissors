@@ -17,6 +17,12 @@ enum ViewInstruction: String {
     case waitingForPlayer2 = "Waiting for Player 2 to start the game"
 }
 
+enum CameraViewContentKind {
+    case CameraFeed
+    case FrozenImage
+    case Text
+}
+
 @MainActor
 final class GameViewModel: ObservableObject {
     @Published private(set) var player2Move: HandMove?
@@ -74,7 +80,7 @@ final class GameViewModel: ObservableObject {
         selectedTargetMove = nil
         playerCameraViewModel.stopSession()
     }
-
+    
     var areMoveSelectionButtonsDisabled: Bool {
         selectedTargetMove != nil
     }
@@ -261,20 +267,6 @@ final class GameViewModel: ObservableObject {
         shufflingMove = .allCases.randomElement()
         startShuffleTimer()
 
-// TODO
-/*   Maybe we can remove the following switch statement
-        switch authorizationStatus {
-        case .authorized, .notDetermined:
-
-        case .denied, .restricted:
-            selectedTargetMove = nil
-            shufflingMove = nil
-        @unknown default:
-            selectedTargetMove = nil
-            shufflingMove = nil
-        }
-        */
-        
         playerCameraViewModel.beginRound()
     }
     
@@ -314,6 +306,8 @@ final class GameViewModel: ObservableObject {
     }
 }
 
+// ****************************************************************************
+// MARK: - PlayerCameraViewModel
 @MainActor
 final class PlayerCameraViewModel: ObservableObject {
     @Published private(set) var authorizationStatus: AVAuthorizationStatus
@@ -324,7 +318,9 @@ final class PlayerCameraViewModel: ObservableObject {
     @Published private(set) var isRoundFrozen: Bool
     @Published private(set) var isRoundActive: Bool
     @Published private(set) var isFrozenImageSaved = false
-
+    
+    var viewContentKind : CameraViewContentKind = .CameraFeed
+    
     var session: AVCaptureSession {
         cameraClassifier.session
     }
@@ -370,12 +366,27 @@ final class PlayerCameraViewModel: ObservableObject {
     func requestCameraAccessIfNeeded() {
         cameraClassifier.requestCameraAccessIfNeeded()
     }
-
+    
+    func updateCameraState(viewContent: CameraViewContentKind) {
+        self.viewContentKind = viewContent
+        if viewContent != .FrozenImage {
+            // reset frozen
+            frozenFrameImage = nil
+        }
+    }
+    
     func beginRound() {
         isFrozenImageSaved = false
         cameraClassifier.beginRound()
+        viewContentKind = .CameraFeed
     }
 
+    // directly command the camera session to restart (after a freeze)
+    func restartSession() {
+        cameraClassifier.startSession(roundBegin: false)
+        updateCameraState(viewContent: .CameraFeed)
+    }
+    
     func stopSession() {
         cameraClassifier.stopSession()
     }
@@ -482,11 +493,32 @@ final class PlayerCameraViewModel: ObservableObject {
                 self?.recognizedMove = state.recognizedMove
                 self?.isRoundFrozen = state.isRoundFrozen
                 self?.isRoundActive = state.isRoundActive
-
                 if state.frozenFrameImage == nil {
                     self?.isFrozenImageSaved = false
                 }
             }
             .store(in: &cancellables)
+        
+        // Observe nil → non-nil transition of frozenFrameImage
+        cameraClassifier.$state
+            .map(\.frozenFrameImage)           // extract just the image
+            .pairwise()                        // get (previous, current) tuples
+            .filter { previous, current in
+                previous == nil && current != nil   // only nil → non-nil
+            }
+            .map { _, current in current! }    // unwrap safely after filter
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] frozenImage in
+                self?.viewContentKind = .FrozenImage   // or whatever state change you need
+                print("Got frozen image")
+            }
+            .store(in: &cancellables)
+    }
+}
+
+extension Publisher {
+    func pairwise() -> AnyPublisher<(Output, Output), Failure> {
+        zip(dropFirst())
+            .eraseToAnyPublisher()
     }
 }

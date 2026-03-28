@@ -126,7 +126,7 @@ struct BvsP1View: View {
             }
         .onDisappear {
             gameViewModel.onDisappear()
-            rtcViewModel.onDestory()
+            rtcViewModel.destroy()
         }
         .onChange(of: gameViewModel.player1Outcome) { newValue in
             showTieEffect = (newValue == .tie)

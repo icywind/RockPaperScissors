@@ -1,21 +1,23 @@
-# Special Effects for Win and Lose - Implementation Complete
+# Refactor AgoraRtcViewModel to Singleton Controller
 
-## Objective
-Add visual special effects to Player 1's area:
-- If Player 1 wins: play sprinkle/confetti effect on Player 1 area
-- If Player 1 loses: place a pink tint color over the Player 1 area
-- If tie: show full-screen "TIE!" overlay
+## Steps (planned):
 
-## Implementation Complete ✅
+1. ✅ [DONE] Create TODO.md with implementation plan
+2. ✅ [DONE] Create new `RockPaperScissors/Controller/AgoraRtcController.swift` - move all RTC logic there as singleton with @Published properties and delegates
+3. ✅ [DONE] Refactor `RockPaperScissors/ViewModel/AgoraRtcViewModel.swift` to proxy to controller (slim ViewModel with only publishing) - class renamed to AgoraViewModel for compatibility
+4. ✅ [DONE] Move simulator extension to `RockPaperScissors/Controller/AgoraRtcController+Simulator.swift` + compilation fixes (typealias, channelName public, syntax)
+5. ✅ [DONE] Update `RockPaperScissors/ViewModel/GameViewModel.swift` - calls compatible (no changes needed)
+6. ✅ [DONE] Update `RockPaperScissors/View/BvsP1View.swift`, `RockPaperScissors/View/P1vsBView.swift` - replace onDestory → destroy
+7. ✅ [DONE] Delete old AgoraViewModel+Simulator.swift
+8. Verify no compilation errors (check dependent imports/types)
+9. [USER TESTING] Manual test P2P modes (video, messages)
+6. Update `RockPaperScissors/View/BvsP1View.swift` - change instantiation/calls to new AgoraRtcViewModel
+7. Update `RockPaperScissors/View/P1vsBView.swift` - change instantiation/calls to new AgoraRtcViewModel
+8. Verify no compilation errors (check dependent imports/types)
+9. [USER TESTING] Manual test P2P modes (video, messages)
 
-### Files Modified/Created:
-1. **ViewModel/GameViewModel.swift** - Added Player1Outcome enum (.win, .lose, .tie)
-2. **View/PlayerCameraAreaView.swift** - Pink tint overlay + Confetti effect
-3. **View/ContentView.swift** - Simplified to use TieEffectView
-4. **View/TieEffectView.swift** - NEW: Separate tie effect view (cleaner code)
+## Progress
+- Current: Step 1 complete
 
-### Effects:
-- **Win**: 60 colorful confetti particles falling with rotation (3 seconds)
-- **Lose**: Pink tint overlay (Color.pink.opacity(0.4))
-- **Tie**: Full-screen "TIE!" with scale + fade animation (2 seconds)
+**Next step:** Proceed to Step 2?
 

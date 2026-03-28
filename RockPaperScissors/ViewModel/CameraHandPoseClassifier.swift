@@ -50,7 +50,7 @@ final class CameraHandPoseClassifier: NSObject {
     var isRoundFrozen: Bool {
         state.isRoundFrozen
     }
-
+    
     override init() {
         super.init()
 
@@ -73,7 +73,7 @@ final class CameraHandPoseClassifier: NSObject {
 
         switch currentStatus {
         case .authorized:
-            startSession()
+            startSession(roundBegin: false)
             if shouldBeginRoundWhenAuthorized {
                 beginRound()
             }
@@ -84,7 +84,7 @@ final class CameraHandPoseClassifier: NSObject {
                 }
 
                 if granted {
-                    self?.startSession()
+                    self?.startSession(roundBegin: false)
                     if self?.shouldBeginRoundWhenAuthorized == true {
                         DispatchQueue.main.async {
                             self?.beginRound()
@@ -106,7 +106,7 @@ final class CameraHandPoseClassifier: NSObject {
         case .authorized:
             shouldBeginRoundWhenAuthorized = false
             resetRoundState()
-            startSession()
+            startSession(roundBegin: true)
         case .notDetermined:
             shouldBeginRoundWhenAuthorized = true
             requestCameraAccessIfNeeded()
@@ -124,7 +124,11 @@ final class CameraHandPoseClassifier: NSObject {
         }
     }
 
-    private func startSession() {
+    ///
+    /// Start the Camera Session
+    ///   roundBegin indicates whether this session belongs to a game round
+    ///   if set to false, reason would be reseting the camera just to capture the feed for preview
+    func startSession(roundBegin:Bool) {
         sessionQueue.async { [weak self] in
             guard let self else { return }
 
@@ -133,7 +137,12 @@ final class CameraHandPoseClassifier: NSObject {
             }
 
             guard self.isSessionConfigured, !self.session.isRunning else { return }
+            
+            if !roundBegin {
+                roundState.reset() // round = .idle
+            }
             print("Session Start running....")
+            
             self.session.startRunning()
         }
     }

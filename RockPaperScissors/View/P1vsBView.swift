@@ -36,7 +36,7 @@ struct P1vsBView: View {
                     
                     //ResultBoxView(resultText: gameViewModel.resultText)
                     ResultBoxView(resultText: "\(gameViewModel.isShuffling ? "Shuffling..." : "Waiting for Player 2")")
-                    ResultBoxView(resultText: "\(rtcViewModel.message ?? "")")  
+                    ResultBoxView(resultText: "\(rtcViewModel.message)")  
 
                     Player2ContainerView(
                         player2Name: "Player 2",
@@ -84,10 +84,17 @@ struct P1vsBView: View {
             }
             .onDisappear {
                 gameViewModel.onDisappear()
-                rtcViewModel.onDestory()
+                rtcViewModel.destroy()
             }
             .onChange(of: gameViewModel.player1Outcome) { newValue in
                 showTieEffect = (newValue == .tie)
+            }
+            .onChange(of: rtcViewModel.hasRemoteUser) { newValue in
+                if !newValue {
+                    // user gone offline
+                    print("Restarting camera ..... ")
+                    gameViewModel.playerCameraViewModel.restartSession()
+                }
             }
             .overlay {
                 if isLoading {

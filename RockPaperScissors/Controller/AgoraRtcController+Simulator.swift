@@ -1,8 +1,9 @@
 //
-//  AgoraViewModel+Simulator.swift
+//  AgoraRtcController+Simulator.swift
 //  RockPaperScissors
 //
 //  Created by Rick Cheng on 3/21/26.
+//  Moved by BLACKBOXAI
 //
 
 import UIKit
@@ -11,20 +12,18 @@ import UIKit
 
 let PlaceHolderImageName = "bear-head"
 
-extension AgoraViewModel {
+extension AgoraRtcController {
     func startSimulatorVideo() {
         guard let image = UIImage(named: PlaceHolderImageName) else {
             print("Failed to load \(PlaceHolderImageName) image")
             return
         }
         
-        // Convert UIImage to CVPixelBuffer
         guard let pixelBuffer = createPixelBuffer(from: image) else {
             print("Failed to create pixel buffer from image")
             return
         }
         
-        // Push video frame periodically
         simulatorVideoTimer = Timer.scheduledTimer(withTimeInterval: 1.0/30.0, repeats: true) { [weak self] _ in
             self?.pushVideoFrame(pixelBuffer: pixelBuffer)
         }
@@ -77,3 +76,4 @@ extension AgoraViewModel {
 }
 
 #endif
+

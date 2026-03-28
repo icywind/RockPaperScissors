@@ -24,7 +24,7 @@ struct PlayerCameraAreaView: View {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .fill(Color.blue.opacity(0.12))
 
-                if let frozenFrameImage = viewModel.frozenFrameImage {
+                if viewModel.viewContentKind == .FrozenImage, let frozenFrameImage = viewModel.frozenFrameImage {
                     Image(uiImage: frozenFrameImage)
                         .resizable()
                         .scaledToFit()
