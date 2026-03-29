@@ -52,85 +52,49 @@ struct EntranceView: View {
                         .font(.headline)
                         .foregroundStyle(.secondary)
                     
-                    // Player vs AI Button
-                    Button {
-                        roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if isRoomNameValid {
-                            navigateToAI = true
-                        } else {
-                            showInvalidRoomAlert = true
-                        }
-                    } label: {
-                        HStack {
-                            humanImage()
-                            Text("vs")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Image(systemName: "cpu").font(.title2)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
-                        .background(Color.accentColor)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
-                    .background(
-                        NavigationLink("", destination: P1vsAIView(roomName: roomName.trimmingCharacters(in: .whitespacesAndNewlines)), isActive: $navigateToAI)
-                            .hidden()
+                    gameModeButton(
+                        leftImage: humanImage(),
+                        rightImage: AnyView(Image(systemName: "cpu").font(.title2)),
+                        backgroundColor: Color.accentColor,
+                        action: {
+                            roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if isRoomNameValid {
+                                navigateToAI = true
+                            } else {
+                                showInvalidRoomAlert = true
+                            }
+                        },
+                        navigationLink: NavigationLink("", destination: P1vsAIView(roomName: roomName), isActive: $navigateToAI)
                     )
                     
-                    // Bear vs Player Button
-                    Button {
-                        roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if isRoomNameValid {
-                            navigateToBear = true
-                        } else {
-                            showInvalidRoomAlert = true
-                        }
-                    } label: {
-                        HStack {
-                            bearImage()
-                            Text("vs")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            humanImage()
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
-                        .background(Color.accentColor.opacity(0.7))
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
-                    .background(
-                        NavigationLink("", destination: BvsP1View(roomName: roomName.trimmingCharacters(in: .whitespacesAndNewlines)), isActive: $navigateToBear)
-                            .hidden()
+                    gameModeButton(
+                        leftImage: bearImage(),
+                        rightImage: humanImage(),
+                        backgroundColor: Color.accentColor.opacity(0.7),
+                        action: {
+                            roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if isRoomNameValid {
+                                navigateToBear = true
+                            } else {
+                                showInvalidRoomAlert = true
+                            }
+                        },
+                        navigationLink: NavigationLink("", destination: BvsP1View(roomName: roomName), isActive: $navigateToBear)
                     )
                     
-                    // Player vs Bear Button
-                    Button {
-                        roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if isRoomNameValid {
-                            navigateToP2 = true
-                        } else {
-                            showInvalidRoomAlert = true
-                        }
-                    } label: {
-                        HStack {
-                            humanImage()
-                            Text("vs")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            bearImage()
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
-                        .background(Color.accentColor.opacity(0.85))
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
-                    .background(
-                        NavigationLink("", destination: P1vsBView(roomName: roomName.trimmingCharacters(in: .whitespacesAndNewlines)), isActive: $navigateToP2)
-                            .hidden()
+                    gameModeButton(
+                        leftImage: humanImage(),
+                        rightImage: bearImage(),
+                        backgroundColor: Color.accentColor.opacity(0.85),
+                        action: {
+                            roomName = roomName.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if isRoomNameValid {
+                                navigateToP2 = true
+                            } else {
+                                showInvalidRoomAlert = true
+                            }
+                        },
+                        navigationLink: NavigationLink("", destination: P1vsBView(roomName: roomName), isActive: $navigateToP2)
                     )
                 }
                 .padding(.horizontal, 32)
@@ -165,6 +129,30 @@ func humanImage() -> some View {
         .scaledToFit()
         .frame(width: 32, height: 32)
     //Image(systemName: "figure.child.circle.fill").font(.title2)
+}
+
+func gameModeButton<L: View, R: View, N: View>(
+    leftImage: L,
+    rightImage: R,
+    backgroundColor: Color,
+    action: @escaping () -> Void,
+    navigationLink: N
+) -> some View {
+    Button(action: action) {
+        HStack {
+            leftImage
+            Text("vs")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            rightImage
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .background(backgroundColor)
+        .foregroundStyle(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+    .background(navigationLink.hidden())
 }
 
 #Preview {

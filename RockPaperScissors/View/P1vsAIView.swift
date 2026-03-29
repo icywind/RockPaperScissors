@@ -20,95 +20,93 @@ struct P1vsAIView: View {
     }
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                VStack(spacing: 12) {
-                    PlayerCameraAreaView(
-                        viewModel: gameViewModel.playerCameraViewModel,
-                        player1Outcome: gameViewModel.player1Outcome
-                    )
+        ZStack {
+            VStack(spacing: 12) {
+                PlayerCameraAreaView(
+                    viewModel: gameViewModel.playerCameraViewModel,
+                    player1Outcome: gameViewModel.player1Outcome
+                )
 
-                    ResultBoxView(resultText: gameViewModel.resultText)
+                ResultBoxView(resultText: gameViewModel.resultText)
 
-                    AIPlayerAreaView(
-                        move: gameViewModel.player2Move,
-                        isShuffling: gameViewModel.isShuffling,
-                        shufflingMove: gameViewModel.shufflingMove
-                    )
-                    .onTapGesture {
-                        if settings.isAutoMode && !gameViewModel.areMoveSelectionButtonsDisabled {
-                            let randomMove = HandMove.allCases.randomElement()!
-                            gameViewModel.startGame(with: randomMove)
-                        }
+                AIPlayerAreaView(
+                    move: gameViewModel.player2Move,
+                    isShuffling: gameViewModel.isShuffling,
+                    shufflingMove: gameViewModel.shufflingMove
+                )
+                .onTapGesture {
+                    if settings.isAutoMode && !gameViewModel.areMoveSelectionButtonsDisabled {
+                        let randomMove = HandMove.allCases.randomElement()!
+                        gameViewModel.startGame(with: randomMove)
                     }
+                }
 
-                    if !settings.isAutoMode {
-                    HStack(spacing: 8) {
-                            ForEach(HandMove.allCases, id: \.rawValue) { move in
-                                Button(action: {
-                                    gameViewModel.startGame(with: move)
-                                }) {
-                                    Image(imageName(for: move))
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 60, height: 60)
-                                        .background(
-                                            gameViewModel.selectedTargetMove == move
-                                                ? Color.accentColor
-                                                : Color.accentColor.opacity(0.85)
-                                        )
-                                        .clipShape(Circle())
-                                }
-                                .buttonStyle(.plain)
-                                .disabled(gameViewModel.areMoveSelectionButtonsDisabled)
-                                .opacity(
-                                    gameViewModel.areMoveSelectionButtonsDisabled && gameViewModel.selectedTargetMove != move
-                                        ? 0.45
-                                        : 1
-                                )
+                if !settings.isAutoMode {
+                HStack(spacing: 8) {
+                        ForEach(HandMove.allCases, id: \.rawValue) { move in
+                            Button(action: {
+                                gameViewModel.startGame(with: move)
+                            }) {
+                                Image(imageName(for: move))
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 60, height: 60)
+                                    .background(
+                                        gameViewModel.selectedTargetMove == move
+                                            ? Color.accentColor
+                                            : Color.accentColor.opacity(0.85)
+                                    )
+                                    .clipShape(Circle())
                             }
+                            .buttonStyle(.plain)
+                            .disabled(gameViewModel.areMoveSelectionButtonsDisabled)
+                            .opacity(
+                                gameViewModel.areMoveSelectionButtonsDisabled && gameViewModel.selectedTargetMove != move
+                                    ? 0.45
+                                    : 1
+                            )
                         }
                     }
                 }
-                .padding(12)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .background(Color(.systemGroupedBackground))
-                
-                TextEffectView(showText:gameViewModel.player1Outcome?.rawValue ?? "",
-                               isShowing: showTextEffect) {
-                    showTextEffect = false
-                    gameViewModel.resetPlayer1Outcome()
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(Color(.systemGroupedBackground))
+            
+            TextEffectView(showText:gameViewModel.player1Outcome?.rawValue ?? "",
+                           isShowing: showTextEffect) {
+                showTextEffect = false
+                gameViewModel.resetPlayer1Outcome()
+            }
+        }
+        .onAppear {
+            gameViewModel.onAppear()
+        }
+        .onDisappear(perform: gameViewModel.onDisappear)
+        .onChange(of: gameViewModel.player1Outcome) { newValue in
+            if let _ = newValue {
+                showTextEffect = true
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Room: \(roomName)")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundColor(.yellow)
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showSettings = true
+                } label: {
+                    Image(systemName: "gear")
                 }
             }
-            .onAppear {
-                gameViewModel.onAppear()
-            }
-            .onDisappear(perform: gameViewModel.onDisappear)
-            .onChange(of: gameViewModel.player1Outcome) { newValue in
-                if let _ = newValue {
-                    showTextEffect = true
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Room: \(roomName)")
-                        .font(.subheadline)
-                        .foregroundStyle(Color.yellow)
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Image(systemName: "gear")
-                    }
-                }
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
-            }
-            .onChange(of: settings.isSoundEnabled) { newValue in
-                gameViewModel.updateSoundSetting(newValue)
-            }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+        .onChange(of: settings.isSoundEnabled) { newValue in
+            gameViewModel.updateSoundSetting(newValue)
         }
     }
 }
