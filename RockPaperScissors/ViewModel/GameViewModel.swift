@@ -111,6 +111,26 @@ final class GameViewModel: ObservableObject {
 
         playerCameraViewModel.beginRound()
     }
+   
+func resetGame() {
+        stopShuffleTimer()
+        player2Move = nil
+        player1Outcome = nil
+        selectedTargetMove = nil
+        shufflingMove = nil
+        
+        // Reset resultText to initial instruction based on player types
+        switch (gameController.playerOneType, gameController.playerTwoType) {
+        case (.human, .buttonpusher):
+            resultText = ViewInstruction.waitingForPlayer2.rawValue
+        case (.human, .computer):
+            resultText = ViewInstruction.computerStartGame.rawValue
+        case (.buttonpusher, _):
+            resultText = ViewInstruction.buttonStartGame.rawValue
+        default:
+            resultText = "under construction"
+        }
+    }
     
     private func startShuffleTimer() {
         shuffleTimer?.invalidate()

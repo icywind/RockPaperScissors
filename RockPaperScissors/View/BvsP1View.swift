@@ -15,8 +15,9 @@ struct BvsP1View: View {
     @StateObject private var gameViewModel: GameViewModel
     @State private var showTextEffect = false
     @State private var isLoading = true
-    
     @State private var remoteUIView = UIView()
+    @State private var alertMessage = ""
+    @State private var showAlertMessage: Bool = false
     
     // MARK: - struct init
     init(roomName: String) {
@@ -133,6 +134,21 @@ struct BvsP1View: View {
             if let _ = newValue {
                 showTextEffect = true
             }
+        }
+        .onChange(of: rtcViewModel.hasRemoteUser) { hasRemoteUser in
+            if !hasRemoteUser && gameViewModel.isShuffling {
+                // stop the game
+                gameViewModel.resetGame()
+                alertMessage = "Opponent left the game :("
+                showAlertMessage = true
+            }
+        }
+        .alert("Information", isPresented: $showAlertMessage) {
+            Button("OK", role: .cancel) {
+                showAlertMessage = false
+            }
+        } message: {
+            Text(alertMessage)
         }
         .overlay {
             if isLoading {
