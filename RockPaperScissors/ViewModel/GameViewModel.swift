@@ -228,7 +228,18 @@ final class GameViewModel: ObservableObject {
             sendPlayer1MoveBack()
         }
     }
-    
+    func getPlayer2Outcome() -> String {
+        switch player1Outcome {
+        case .win:
+            return "DEFEATED"
+        case .lose:
+            return "WINNER!"
+        case .tie:
+            return "TIE!"
+        case nil:
+            return ""
+        }
+    }
     private func setupVideoFrameForwarding() {
         // Connect camera classifier's video frames to Agora for external video push (only in P2P mode)
         if rtcViewModel != nil {

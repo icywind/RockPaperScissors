@@ -11,7 +11,7 @@ struct P1vsAIView: View {
     let roomName: String
     @StateObject private var gameViewModel: GameViewModel
     @StateObject private var settings = Settings.shared
-    @State private var showTieEffect = false
+    @State private var showTextEffect = false
     @State private var showSettings = false
     
     init(roomName: String) {
@@ -75,8 +75,8 @@ struct P1vsAIView: View {
                 .background(Color(.systemGroupedBackground))
                 
                 TextEffectView(showText:gameViewModel.player1Outcome?.rawValue ?? "",
-                               isShowing: showTieEffect) {
-                    showTieEffect = false
+                               isShowing: showTextEffect) {
+                    showTextEffect = false
                     gameViewModel.resetPlayer1Outcome()
                 }
             }
@@ -86,7 +86,7 @@ struct P1vsAIView: View {
             .onDisappear(perform: gameViewModel.onDisappear)
             .onChange(of: gameViewModel.player1Outcome) { newValue in
                 if let _ = newValue {
-                    showTieEffect = true
+                    showTextEffect = true
                 }
             }
             .toolbar {

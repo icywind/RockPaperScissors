@@ -11,7 +11,7 @@ struct P1vsBView: View {
     let roomName: String
     @StateObject private var rtcViewModel: AgoraViewModel
     @StateObject private var gameViewModel: GameViewModel
-    @State private var showTieEffect = false
+    @State private var showTextEffect = false
     @State private var isLoading = true
     
     @State private var remoteUIView = UIView()
@@ -36,7 +36,7 @@ struct P1vsBView: View {
                     
                     //ResultBoxView(resultText: gameViewModel.resultText)
                     ResultBoxView(resultText: "\(gameViewModel.isShuffling ? "Shuffling..." : "Waiting for Player 2")")
-                    ResultBoxView(resultText: "\(rtcViewModel.message)")  
+                    // ResultBoxView(resultText: "\(rtcViewModel.message)")
 
                     Player2ContainerView(
                         player2Name: "Player 2",
@@ -61,9 +61,9 @@ struct P1vsBView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(Color(.systemGroupedBackground))
                 
-                TextEffectView(showText:gameViewModel.player1Outcome?.rawValue ?? "", 
-                    isShowing: showTieEffect) {
-                    showTieEffect = false
+                TextEffectView(showText:gameViewModel.player1Outcome?.rawValue ?? "",
+                               isShowing: showTextEffect) {
+                    showTextEffect = false
                     gameViewModel.resetPlayer1Outcome()
                 }
             }
@@ -87,7 +87,9 @@ struct P1vsBView: View {
                 rtcViewModel.destroy()
             }
             .onChange(of: gameViewModel.player1Outcome) { newValue in
-                showTieEffect = (newValue == .tie)
+                if let _ = newValue {
+                    showTextEffect = true
+                }
             }
             .onChange(of: rtcViewModel.hasRemoteUser) { newValue in
                 if !newValue {
