@@ -34,6 +34,8 @@ struct P1vsAIView: View {
                     isShuffling: gameViewModel.isShuffling,
                     shufflingMove: gameViewModel.shufflingMove
                 )
+                .frame(maxWidth: .infinity)
+                .frame(height: UIScreen.main.bounds.height < 800 ? 120 : 220)
                 .onTapGesture {
                     if settings.isAutoMode && !gameViewModel.areMoveSelectionButtonsDisabled {
                         let randomMove = HandMove.allCases.randomElement()!
@@ -42,34 +44,11 @@ struct P1vsAIView: View {
                 }
 
                 if !settings.isAutoMode {
-                HStack(spacing: 8) {
-                        ForEach(HandMove.allCases, id: \.rawValue) { move in
-                            Button(action: {
-                                gameViewModel.startGame(with: move)
-                            }) {
-                                Image(imageName(for: move))
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 60, height: 60)
-                                    .background(
-                                        gameViewModel.selectedTargetMove == move
-                                            ? Color.accentColor
-                                            : Color.accentColor.opacity(0.85)
-                                    )
-                                    .clipShape(Circle())
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(gameViewModel.areMoveSelectionButtonsDisabled)
-                            .opacity(
-                                gameViewModel.areMoveSelectionButtonsDisabled && gameViewModel.selectedTargetMove != move
-                                    ? 0.45
-                                    : 1
-                            )
-                        }
-                    }
+                    handMoveButtonsView()
                 }
             }
-            .padding(12)
+            .padding(.horizontal, 12)
+            .padding(.bottom, 12)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(Color(.systemGroupedBackground))
             
@@ -107,6 +86,36 @@ struct P1vsAIView: View {
         }
         .onChange(of: settings.isSoundEnabled) { newValue in
             gameViewModel.updateSoundSetting(newValue)
+        }
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func handMoveButtonsView() -> some View {
+        HStack(spacing: 8) {
+            ForEach(HandMove.allCases, id: \.rawValue) { move in
+                Button(action: {
+                    gameViewModel.startGame(with: move)
+                }) {
+                    Image(imageName(for: move))
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 60, height: 60)
+                        .background(
+                            gameViewModel.selectedTargetMove == move
+                                ? Color.accentColor
+                                : Color.accentColor.opacity(0.85)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(gameViewModel.areMoveSelectionButtonsDisabled)
+                .opacity(
+                    gameViewModel.areMoveSelectionButtonsDisabled && gameViewModel.selectedTargetMove != move
+                        ? 0.45
+                        : 1
+                )
+            }
         }
     }
 }

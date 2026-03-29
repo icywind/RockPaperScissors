@@ -30,56 +30,42 @@ struct BvsP1View: View {
     var body: some View {
         ZStack {
             VStack(spacing: 12) {
-                Player2ContainerView(
-                player2Name: "Player 1",
-                player2Description: "Remote user",
-                subView:
-                    VideoContainerView(uiView: remoteUIView)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 220)
-            )
-
-            ResultBoxView(resultText: gameViewModel.resultText)
-
-            AIPlayerAreaView(
-                move: gameViewModel.player2Move,
-                isShuffling: gameViewModel.isShuffling,
-                shufflingMove: gameViewModel.shufflingMove
-            )
-
-            HStack(spacing: 8) {
-                ForEach(HandMove.allCases, id: \.rawValue) { move in
-                    Button(action: {
-                        gameViewModel.startGame(with: move)
-                        let msg = NetworkMessage(
-                            requiredP1Mode: .human,
-                            remoteP2Mode: .buttonpusher,
-                            remoteP2Move: move
-                        )
-                        rtcViewModel.sendMessage(message: msg)
-                    }) {
-                        Image(bearImageName(for: move))
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 60, height: 60)
-                            .background(
-                                gameViewModel.selectedTargetMove == move
-                                    ? Color.accentColor
-                                    : Color.accentColor.opacity(0.85)
-                            )
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(gameViewModel.areMoveSelectionButtonsDisabled)
-                    .opacity(
-                        gameViewModel.areMoveSelectionButtonsDisabled && gameViewModel.selectedTargetMove != move
-                            ? 0.45
-                            : 1
+                ZStack(alignment: .bottomTrailing) {
+                    Player2ContainerView(
+                        player2Name: "Player 1",
+                        player2Description: "Remote user",
+                        subView:
+                            VideoContainerView(uiView: remoteUIView)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .frame(maxWidth: UIScreen.main.bounds.width - 24)
+                            .frame(height: 220)
                     )
+                    if UIScreen.main.bounds.height < 800 {
+                        AIPlayerAreaView(
+                            move: gameViewModel.player2Move,
+                            isShuffling: gameViewModel.isShuffling,
+                            shufflingMove: gameViewModel.shufflingMove
+                        )
+                        .frame(width: 100, height: 100)
+                        .padding(8)
+                    }
                 }
+
+                ResultBoxView(resultText: gameViewModel.resultText)
+                
+                if UIScreen.main.bounds.height >= 800 {
+                    AIPlayerAreaView(
+                        move: gameViewModel.player2Move,
+                        isShuffling: gameViewModel.isShuffling,
+                        shufflingMove: gameViewModel.shufflingMove
+                    )
+                    .frame(height: 200)
+                    .padding(8)
                 }
+                
+                handMoveButtonsView()
+                .frame(maxHeight: .infinity)
             }
             .padding(12)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -92,38 +78,7 @@ struct BvsP1View: View {
             }
         }
         .onAppear {
-            Task {
-                isLoading = true
-                rtcViewModel.onAppear(remoteView: remoteUIView)
-                try await Task.sleep(nanoseconds: 50_000_000) // 0.5sec
-                gameViewModel.onAppear()
-                isLoading = false
-            }
-            // Set up network message handler to receive Player1's move
-            rtcViewModel.onNetworkMessageReceived = { message in
-                // In BvsP1View, we receive the Player1's move back
-                // Determine the game result using the remote player's move
-                print("Received Player1's move: \(message.remoteP2Move, default: "unknown")")
-                
-                // Get the local player's (Bear/Player 2) move from the game view model
-                guard let localMove = gameViewModel.selectedTargetMove else {
-                    print("No local move selected yet")
-                    return
-                }
-                
-                // Determine the winner using GameController
-                let gameController = GameController(playerOneType: .buttonpusher, playerTwoType: .human)
-                let outcome = gameController.concludeRound(
-                    playerOneMove: message.remoteP2Move,
-                    playerTwoMove: localMove
-                )
-                
-                // Update the game view model with the result
-                gameViewModel.updateResultFromNetwork(
-                    player2Move: outcome.playerTwoMove,
-                    resultText: outcome.resultText
-                )
-            }
+            setupViewModels()
         }
         .onDisappear {
             gameViewModel.onDisappear()
@@ -166,16 +121,89 @@ struct BvsP1View: View {
             }
         }
     }
-}
-
-private func bearImageName(for move: HandMove) -> String {
-    switch move {
-    case .rock:
-        return "bear-rock"
-    case .paper:
-        return "bear-paper"
-    case .scissors:
-        return "bear-scissors"
+    
+    // MARK: - Helper Functions
+    
+    private func bearImageName(for move: HandMove) -> String {
+        switch move {
+        case .rock:
+            return "bear-rock"
+        case .paper:
+            return "bear-paper"
+        case .scissors:
+            return "bear-scissors"
+        }
+    }
+    
+    private func handMoveButtonsView() -> some View {
+        HStack(spacing: 12) {
+            ForEach(HandMove.allCases, id: \.rawValue) { move in
+                Button(action: {
+                    gameViewModel.startGame(with: move)
+                    let msg = NetworkMessage(
+                        requiredP1Mode: .human,
+                        remoteP2Mode: .buttonpusher,
+                        remoteP2Move: move
+                    )
+                    rtcViewModel.sendMessage(message: msg)
+                }) {
+                    Image(bearImageName(for: move))
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: min(120, (UIScreen.main.bounds.width - 48) / 3), height: min(120, (UIScreen.main.bounds.width - 48) / 3))
+                        .background(
+                            gameViewModel.selectedTargetMove == move
+                            ? Color.accentColor
+                            : Color.accentColor.opacity(0.85)
+                        )
+                        //.clipShape(Circle())
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(gameViewModel.areMoveSelectionButtonsDisabled)
+                .opacity(
+                    gameViewModel.areMoveSelectionButtonsDisabled && gameViewModel.selectedTargetMove != move
+                    ? 0.45
+                    : 1
+                )
+            }
+        }
+        .frame(maxWidth: UIScreen.main.bounds.width - 24)
+    }
+    
+    private func setupViewModels() {
+        Task {
+            isLoading = true
+            rtcViewModel.onAppear(remoteView: remoteUIView)
+            try await Task.sleep(nanoseconds: 50_000_000) // 0.5sec
+            gameViewModel.onAppear()
+            isLoading = false
+        }
+        // Set up network message handler to receive Player1's move
+        rtcViewModel.onNetworkMessageReceived = { message in
+            // In BvsP1View, we receive the Player1's move back
+            // Determine the game result using the remote player's move
+            print("Received Player1's move: \(message.remoteP2Move, default: "unknown")")
+            
+            // Get the local player's (Bear/Player 2) move from the game view model
+            guard let localMove = gameViewModel.selectedTargetMove else {
+                print("No local move selected yet")
+                return
+            }
+            
+            // Determine the winner using GameController
+            let gameController = GameController(playerOneType: .buttonpusher, playerTwoType: .human)
+            let outcome = gameController.concludeRound(
+                playerOneMove: message.remoteP2Move,
+                playerTwoMove: localMove
+            )
+            
+            // Update the game view model with the result
+            gameViewModel.updateResultFromNetwork(
+                player2Move: outcome.playerTwoMove,
+                resultText: outcome.resultText
+            )
+        }
     }
 }
 

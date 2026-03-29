@@ -7,35 +7,28 @@ struct AIPlayerAreaView: View {
     let shufflingMove: HandMove?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(Color.purple.opacity(0.12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24, style: .continuous)
-                            .stroke(Color.purple.opacity(0.35), lineWidth: 1.5)
-                    )
+        ZStack {
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color.purple.opacity(0.32))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(Color.purple.opacity(0.65), lineWidth: 1.5)
+                )
 
-                VStack(spacing: 10) {
-                    if isShuffling, let shuffleMove = shufflingMove {
-                        Image("\(petName)-\(shuffleMove.imageName)")
-                            .resizable()
-                            .scaledToFit()
-                    } else if let move = move {
-                        Image("\(petName)-\(move.imageName)")
-                            .resizable()
-                            .scaledToFit()
-                    } else {
-                        Image(systemName: "cpu")
-                            .font(.system(size: 52))
-                            .foregroundStyle(.purple)
-                    }
+            VStack(spacing: 10) {
+                if isShuffling, let shuffleMove = shufflingMove {
+                    Image("\(petName)-\(shuffleMove.imageName)")
+                        .resizable()
+                        .scaledToFit()
+                } else if let move = move {
+                    Image("\(petName)-\(move.imageName)")
+                        .resizable()
+                        .scaledToFit()
+                } else {
+                    bearImage(height: 90)
                 }
-                .padding()
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 220)
-
+            .padding(10)
         }
     }
 }
@@ -50,9 +43,9 @@ struct AIPlayerAreaView: View {
             .frame(height: 220)
         
         AIPlayerAreaView(
-            move: .paper,
-            isShuffling: true,
-            shufflingMove: .paper
+            move: nil,
+            isShuffling: false,
+            shufflingMove: nil
         )
     }
 }

@@ -115,19 +115,19 @@ struct EntranceView: View {
     }
 }
 
-func bearImage() -> some View {
+func bearImage(height: CGFloat = 32) -> some View {
     Image("bear_")
         .resizable()
         .scaledToFit()
-        .frame(width: 32, height: 32)
+        .frame(width: height, height: height)
     // Image(systemName: "teddybear.fill").font(.title2)
 }
 
-func humanImage() -> some View {
+func humanImage(height: CGFloat = 32) -> some View {
     Image("daughter_")
         .resizable()
         .scaledToFit()
-        .frame(width: 32, height: 32)
+        .frame(width: height, height: height)
     //Image(systemName: "figure.child.circle.fill").font(.title2)
 }
 

@@ -27,7 +27,7 @@ struct P1vsBView: View {
     // MARK: - View body
     var body: some View {
         ZStack {
-            VStack(spacing: 12) {
+            VStack(spacing: 16) {
                 PlayerCameraAreaView(
                     viewModel: gameViewModel.playerCameraViewModel,
                     player1Outcome: gameViewModel.player1Outcome
@@ -46,17 +46,20 @@ struct P1vsBView: View {
                                 .background(Color.white)
                                 .cornerRadius(8)
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 220)
+                                .frame(height: UIScreen.main.bounds.height < 800 ? 120 : 220)
                             
                             AIPlayerAreaView(
                                 move: gameViewModel.player2Move,
                                 isShuffling: gameViewModel.isShuffling,
                                 shufflingMove: gameViewModel.shufflingMove
                             )
+                            .frame(maxWidth: .infinity)
+                            .frame(height: UIScreen.main.bounds.height < 800 ? 120 : 220)
                         }
                 )
             }
-            .padding(12)
+            .padding(.horizontal, 12)
+            .padding(.bottom, 12)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(Color(.systemGroupedBackground))
             
