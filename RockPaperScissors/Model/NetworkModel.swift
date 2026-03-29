@@ -10,5 +10,5 @@ struct NetworkMessage : Codable, Identifiable {
     var id = UUID()
     let requiredP1Mode :  PlayerType
     let remoteP2Mode : PlayerType
-    let remoteP2Move : HandMove
+    let remoteP2Move : HandMove?
 }

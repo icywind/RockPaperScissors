@@ -58,9 +58,5 @@ class AgoraViewModel: ObservableObject {
     func sendMessage(message: NetworkMessage) {
         rtcController.sendMessage(message: message)
     }
-    
-    func sendMessage(_ message: String) {
-        rtcController.sendMessage(message: message)
-    }
 }
 

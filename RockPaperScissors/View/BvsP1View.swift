@@ -102,7 +102,7 @@ struct BvsP1View: View {
                 rtcViewModel.onNetworkMessageReceived = { message in
                     // In BvsP1View, we receive the Player1's move back
                     // Determine the game result using the remote player's move
-                    print("Received Player1's move: \(message.remoteP2Move)")
+                    print("Received Player1's move: \(message.remoteP2Move, default: "unknown")")
                     
                     // Get the local player's (Bear/Player 2) move from the game view model
                     guard let localMove = gameViewModel.selectedTargetMove else {

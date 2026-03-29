@@ -76,6 +76,15 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
         // Set audio route to speaker
         agoraKit.setDefaultAudioRouteToSpeakerphone(true)
         
+        // create the data stream
+        // Each user can create up to five data streams during the lifecycle of the agoraKit
+        let strmConfig = AgoraDataStreamConfig()
+        let result = agoraKit.createDataStream(&streamId, config: strmConfig)
+        if result != 0 {
+            let message = "createDataStream call failed: \(result), please check your params"
+            print(message)
+        }
+        
         // get channel name from configs
         guard let channelName = configs["channelName"] as? String else { return }
         
@@ -141,37 +150,23 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
         let json = try? encoder.encode(message)
         guard let json else { return }
         
-        var result: Int32 = 0
-        if streamId == 0 {
-            result = agoraKit.createDataStream(&streamId, reliable: true, ordered: true)
-            if result != 0 {
-                print("create data stream failed, error: \(result)")
-            }
-        } else {
-            print("datastream id:", streamId)
-        }
-        
         let sendResult = agoraKit.sendStreamMessage(streamId, data: json)
         if sendResult != 0 {
             print("send message failed, error = \(sendResult)")
         }
     }
     
-    func sendMessage(message: String) {
-        var result: Int32 = 0
-        if streamId == 0 {
-            result = agoraKit.createDataStream(&streamId, reliable: true, ordered: true)
-            if result != 0 {
-                print("create data stream failed, error: \(result)")
-            }
-        }
-        
-        let sendResult = agoraKit.sendStreamMessage(streamId, data: Data(message.utf8))
+    func sendWords(message: String) {
+        // indicate if stream has created
+        let sendResult = agoraKit.sendStreamMessage(streamId,
+                                                    data: Data(message.utf8))
         if sendResult != 0 {
-            print("send message failed, error: \(sendResult)")
+            let message = "sendStreamMessage call failed: \(sendResult), please check your params"
+            print(message)
+        } else {
+            print("Sent message:\(message)")
         }
     }
-    
     // MARK: - Delegates for RTC Engine events
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
@@ -206,7 +201,7 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
         videoCanvas.renderMode = .hidden
         agoraKit.setupRemoteVideo(videoCanvas)
         hasRemoteUser = true
-        sendMessage(message: "Hello \(uid)")
+        sendWords(message: "Hello \(uid)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
@@ -223,18 +218,16 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
         videoCanvas.view = nil
         videoCanvas.renderMode = .hidden
         agoraKit.setupRemoteVideo(videoCanvas)
-        
-        streamId = 0
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
         let text = String.init(data: data, encoding: .utf8) ?? ""
-        message = "receiveStreamMessageFromUid: \(uid) \(text)"
+        message = "receiveStreamMessageFromUid: \(uid) stream:\(streamId) \(text)"
         print(message)
         
         if uid == activeRemoteUserUid {
             if let msg = try? JSONDecoder().decode(NetworkMessage.self, from: data) {
-                print("msg.move: \(msg.remoteP2Move)")
+                print("msg.move: \(msg.remoteP2Move, default: "unrecognized")")
                 onNetworkMessageReceived?(msg)
             }
         }

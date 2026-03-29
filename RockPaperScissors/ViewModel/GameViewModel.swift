@@ -248,7 +248,10 @@ final class GameViewModel: ObservableObject {
         }
         
         // Store the remote player's move
-        let remoteMove = message.remoteP2Move
+        guard let remoteMove = message.remoteP2Move else {
+            print("Remote move not recognized, skipping.")
+            return
+        }
         
         // Start the game with the remote player's move as the target
         startGameFromNetwork(with: remoteMove)
@@ -271,19 +274,20 @@ final class GameViewModel: ObservableObject {
     }
     
     private func sendPlayer1MoveBack() {
-        guard let player1Move = playerCameraViewModel.recognizedMove else {
-            print("No Player1 move to send back")
-            return
-        }
+        // even not recognized, still need to send something back, or P2 keeps waiting
+//        guard let player1Move = playerCameraViewModel.recognizedMove else {
+//            print("No Player1 move to send back")
+//            return
+//        }
         
         let responseMessage = NetworkMessage(
             requiredP1Mode: .human,
             remoteP2Mode: .buttonpusher,
-            remoteP2Move: player1Move
+            remoteP2Move: playerCameraViewModel.recognizedMove
         )
         
         rtcViewModel?.sendMessage(message: responseMessage)
-        print("Sent Player1 move back: \(player1Move)")
+        print("Sent Player1 move back...")
     }
     
     // MARK: - Network Result Handling
