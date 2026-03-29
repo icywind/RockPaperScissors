@@ -26,9 +26,9 @@ struct P1vsBView: View {
     
     // MARK: - View body
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
-                VStack(spacing: 18) {
+                VStack(spacing: 12) {
                     PlayerCameraAreaView(
                         viewModel: gameViewModel.playerCameraViewModel,
                         player1Outcome: gameViewModel.player1Outcome
@@ -42,7 +42,7 @@ struct P1vsBView: View {
                         player2Name: "Player 2",
                         player2Description: "Remote user",
                         subView:
-                            HStack(spacing: 10) {
+                            HStack(spacing: 6) {
                                 VideoContainerView(uiView: remoteUIView)
                                     .background(Color.white)
                                     .cornerRadius(8)
@@ -57,7 +57,7 @@ struct P1vsBView: View {
                             }
                     )
                 }
-                .padding(20)
+                .padding(12)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(Color(.systemGroupedBackground))
                 
@@ -71,7 +71,7 @@ struct P1vsBView: View {
                 Task {
                     isLoading = true
                     rtcViewModel.onAppear(remoteView: remoteUIView)
-                    try await Task.sleep(for: .seconds(0.5))
+                    try await Task.sleep(nanoseconds: 100_000_000) // 1 sec
                     gameViewModel.onAppear()
                     isLoading = false
                 }

@@ -19,8 +19,8 @@ struct EntranceView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 40) {
+        NavigationView {
+            VStack(spacing: 24) {
                 Spacer()
                 
                 // App Title
@@ -62,13 +62,11 @@ struct EntranceView: View {
                         }
                     } label: {
                         HStack {
-                            Image(systemName: "person.fill")
-                                .font(.title2)
+                            humanImage()
                             Text("vs")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Image(systemName: "cpu")
-                                .font(.title2)
+                            Image(systemName: "cpu").font(.title2)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)
@@ -76,6 +74,10 @@ struct EntranceView: View {
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
+                    .background(
+                        NavigationLink("", destination: P1vsAIView(roomName: roomName.trimmingCharacters(in: .whitespacesAndNewlines)), isActive: $navigateToAI)
+                            .hidden()
+                    )
                     
                     // Bear vs Player Button
                     Button {
@@ -87,13 +89,11 @@ struct EntranceView: View {
                         }
                     } label: {
                         HStack {
-                            Image(systemName: "teddybear.fill")
-                                .font(.title2)
+                            bearImage()
                             Text("vs")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Image(systemName: "person.fill")
-                                .font(.title2)
+                            humanImage()
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)
@@ -101,6 +101,10 @@ struct EntranceView: View {
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
+                    .background(
+                        NavigationLink("", destination: BvsP1View(roomName: roomName.trimmingCharacters(in: .whitespacesAndNewlines)), isActive: $navigateToBear)
+                            .hidden()
+                    )
                     
                     // Player vs Bear Button
                     Button {
@@ -112,13 +116,11 @@ struct EntranceView: View {
                         }
                     } label: {
                         HStack {
-                            Image(systemName: "person.fill")
-                                .font(.title2)
+                            humanImage()
                             Text("vs")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Image(systemName: "teddybear.fill")
-                                .font(.title2)
+                            bearImage()
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)
@@ -126,6 +128,10 @@ struct EntranceView: View {
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
+                    .background(
+                        NavigationLink("", destination: P1vsBView(roomName: roomName.trimmingCharacters(in: .whitespacesAndNewlines)), isActive: $navigateToP2)
+                            .hidden()
+                    )
                 }
                 .padding(.horizontal, 32)
                 
@@ -134,22 +140,31 @@ struct EntranceView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color(.systemGroupedBackground))
+            .navigationTitle("")
+            .navigationBarHidden(true)
             .alert("Invalid Room Name", isPresented: $showInvalidRoomAlert) {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text("Room name must be at least 3 characters long.")
             }
-            .navigationDestination(isPresented: $navigateToAI) {
-                P1vsAIView(roomName: roomName)
-            }
-            .navigationDestination(isPresented: $navigateToBear) {
-                BvsP1View(roomName: roomName)
-            }
-            .navigationDestination(isPresented: $navigateToP2) {
-                P1vsBView(roomName: roomName)
-            }
         }
     }
+}
+
+func bearImage() -> some View {
+    Image("bear_")
+        .resizable()
+        .scaledToFit()
+        .frame(width: 32, height: 32)
+    // Image(systemName: "teddybear.fill").font(.title2)
+}
+
+func humanImage() -> some View {
+    Image("daughter_")
+        .resizable()
+        .scaledToFit()
+        .frame(width: 32, height: 32)
+    //Image(systemName: "figure.child.circle.fill").font(.title2)
 }
 
 #Preview {

@@ -28,9 +28,9 @@ struct BvsP1View: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
-                VStack(spacing: 18) {
+                VStack(spacing: 12) {
                     Player2ContainerView(
                     player2Name: "Player 1",
                     player2Description: "Remote user",
@@ -50,7 +50,7 @@ struct BvsP1View: View {
                     shufflingMove: gameViewModel.shufflingMove
                 )
 
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     ForEach(HandMove.allCases, id: \.rawValue) { move in
                         Button(action: {
                             gameViewModel.startGame(with: move)
@@ -64,7 +64,7 @@ struct BvsP1View: View {
                             Image(bearImageName(for: move))
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 80, height: 80)
+                                .frame(width: 60, height: 60)
                                 .background(
                                     gameViewModel.selectedTargetMove == move
                                         ? Color.accentColor
@@ -82,7 +82,7 @@ struct BvsP1View: View {
                     }
                     }
                 }
-                .padding(20)
+                .padding(12)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(Color(.systemGroupedBackground))
                 
@@ -96,7 +96,7 @@ struct BvsP1View: View {
                 Task {
                     isLoading = true
                     rtcViewModel.onAppear(remoteView: remoteUIView)
-                    try await Task.sleep(for: .seconds(0.5))
+                    try await Task.sleep(nanoseconds: 50_000_000) // 0.5sec
                     gameViewModel.onAppear()
                     isLoading = false
                 }

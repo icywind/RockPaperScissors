@@ -20,9 +20,9 @@ struct P1vsAIView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
-                VStack(spacing: 18) {
+                VStack(spacing: 12) {
                     PlayerCameraAreaView(
                         viewModel: gameViewModel.playerCameraViewModel,
                         player1Outcome: gameViewModel.player1Outcome
@@ -43,7 +43,7 @@ struct P1vsAIView: View {
                     }
 
                     if !settings.isAutoMode {
-                        HStack(spacing: 12) {
+                    HStack(spacing: 8) {
                             ForEach(HandMove.allCases, id: \.rawValue) { move in
                                 Button(action: {
                                     gameViewModel.startGame(with: move)
@@ -51,7 +51,7 @@ struct P1vsAIView: View {
                                     Image(imageName(for: move))
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 80, height: 80)
+                                        .frame(width: 60, height: 60)
                                         .background(
                                             gameViewModel.selectedTargetMove == move
                                                 ? Color.accentColor
@@ -70,7 +70,7 @@ struct P1vsAIView: View {
                         }
                     }
                 }
-                .padding(20)
+                .padding(12)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(Color(.systemGroupedBackground))
                 
