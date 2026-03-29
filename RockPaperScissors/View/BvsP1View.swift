@@ -199,10 +199,12 @@ struct BvsP1View: View {
             )
             
             // Update the game view model with the result
-            gameViewModel.updateResultFromNetwork(
-                player2Move: outcome.playerTwoMove,
-                resultText: outcome.resultText
-            )
+            DispatchQueue.main.async {
+                gameViewModel.updateResultFromNetwork(
+                    player2Move: outcome.playerTwoMove,
+                    resultText: outcome.resultText
+                )
+            }
         }
     }
 }

@@ -43,9 +43,9 @@ struct AIPlayerAreaView: View {
             .frame(height: 220)
         
         AIPlayerAreaView(
-            move: nil,
+            move: .rock,
             isShuffling: false,
-            shufflingMove: nil
+            shufflingMove: .paper
         )
     }
 }

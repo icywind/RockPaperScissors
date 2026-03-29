@@ -293,7 +293,7 @@ func resetGame() {
         print("startGameFromNetwork move=\(remoteMove)")
         
         let authorizationStatus = playerCameraViewModel.authorizationStatus
-        // player2Move = remoteMove
+        player2Move = remoteMove
         player1Outcome = nil
         resultText = gameController.startRoundMessage(for: authorizationStatus)
         isShuffling = true

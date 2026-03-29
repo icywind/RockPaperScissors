@@ -1,6 +1,6 @@
 import Foundation
 
-enum HandMove: String, CaseIterable, Codable {
+enum HandMove: String, Equatable, CaseIterable, Codable {
     case rock = "Rock"
     case paper = "Paper"
     case scissors = "Scissors"

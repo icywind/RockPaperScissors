@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct Player2ContainerView<Content: View>: View {
-    @State var player2Name: String
-    @State var player2Description: String
-    @State var subView : Content
+    let player2Name: String
+    let player2Description: String
+    let subView: Content
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -18,12 +18,13 @@ struct Player2ContainerView<Content: View>: View {
                 Text(player2Name)
                     .font(.title3.weight(.semibold))
                     .frame(maxWidth: .infinity, alignment: .trailing)
+
                 Text(player2Description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            
+
             subView
         }
     }
