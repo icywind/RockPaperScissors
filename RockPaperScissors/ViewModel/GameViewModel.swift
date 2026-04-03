@@ -15,6 +15,7 @@ enum ViewInstruction: String {
     case buttonStartGame = "Choose Rock, Paper, or Scissors to start the game."
     case computerStartGame = "Tap the Player 2 area to start the game"
     case waitingForPlayer2 = "Waiting for Player 2 to start the game"
+    case waitingForRemotePlayer = "Waiting for Player to join..." // NEW
 }
 
 enum CameraViewContentKind {
@@ -45,7 +46,7 @@ final class GameViewModel: ObservableObject {
         player2Type p2Type: PlayerType,
         playerCameraViewModel: PlayerCameraViewModel? = nil,
         gameController: GameController? = nil,
-        rtcViewModel: AgoraViewModel? = nil,
+        rtcViewModel: AgoraViewModel? = nil
     ) {
         self.playerCameraViewModel = playerCameraViewModel ?? PlayerCameraViewModel()
         self.gameController = gameController ?? GameController( playerOneType: p1Type, playerTwoType: p2Type)
@@ -53,6 +54,7 @@ final class GameViewModel: ObservableObject {
         setUpInitialInstruction(player1Type: p1Type, player2Type: p2Type)
         bindCameraState()
         setupVideoFrameForwarding()
+        bindRTCState() // Call the new binding function
     }
     
     private func setUpInitialInstruction( player1Type p1Type: PlayerType,
@@ -64,7 +66,13 @@ final class GameViewModel: ObservableObject {
                 resultText = ViewInstruction.computerStartGame.rawValue
             }
         } else if p1Type == .buttonpusher {
-            resultText = ViewInstruction.buttonStartGame.rawValue
+            // Initial instruction for buttonpusher depends on remote user presence
+            // Check current status of rtcViewModel for initial display
+            if let rtcViewModel = rtcViewModel, rtcViewModel.hasRemoteUser {
+                resultText = ViewInstruction.buttonStartGame.rawValue
+            } else {
+                resultText = ViewInstruction.waitingForRemotePlayer.rawValue
+            }
         } else {
             resultText = "under construction"
         }
@@ -112,7 +120,7 @@ final class GameViewModel: ObservableObject {
         playerCameraViewModel.beginRound()
     }
    
-func resetGame() {
+    func resetGame() {
         stopShuffleTimer()
         player2Move = nil
         player1Outcome = nil
@@ -126,7 +134,12 @@ func resetGame() {
         case (.human, .computer):
             resultText = ViewInstruction.computerStartGame.rawValue
         case (.buttonpusher, _):
-            resultText = ViewInstruction.buttonStartGame.rawValue
+            // When resetting, determine message based on remote user presence
+            if let rtcViewModel = rtcViewModel, rtcViewModel.hasRemoteUser {
+                resultText = ViewInstruction.buttonStartGame.rawValue
+            } else {
+                resultText = ViewInstruction.waitingForRemotePlayer.rawValue
+            }
         default:
             resultText = "under construction"
         }
@@ -191,6 +204,28 @@ func resetGame() {
             .store(in: &cancellables)
     }
 
+    private func bindRTCState() {
+        guard gameController.playerOneType == .buttonpusher, let rtcViewModel = rtcViewModel else {
+            return
+        }
+
+        rtcViewModel.$hasRemoteUser
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] hasRemoteUser in
+                guard let self = self else { return }
+                // Only update the instruction text if a game round is not actively shuffling
+                // and no move has been selected yet. This prevents interrupting an ongoing game.
+                if !self.isShuffling && self.selectedTargetMove == nil {
+                    if hasRemoteUser {
+                        self.resultText = ViewInstruction.buttonStartGame.rawValue
+                    } else {
+                        self.resultText = ViewInstruction.waitingForRemotePlayer.rawValue
+                    }
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
     private func playAudio() {
         guard Settings.shared.isSoundEnabled else { return }
         

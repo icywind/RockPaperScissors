@@ -125,7 +125,7 @@ struct BvsP1View: View {
     // MARK: - Helper Functions
     
     private func bearImageName(for move: HandMove) -> String {
-        "\(petName)-\(move.imageName)"
+        "bear-\(move.imageName)"
     }
     
     private func handMoveButtonsView() -> some View {
@@ -153,9 +153,11 @@ struct BvsP1View: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
                 .buttonStyle(.plain)
-                .disabled(gameViewModel.areMoveSelectionButtonsDisabled)
+                // Disable if gameViewModel says so, OR if no remote user is present
+                .disabled(gameViewModel.areMoveSelectionButtonsDisabled || !rtcViewModel.hasRemoteUser)
+                // Adjust opacity based on game state OR remote user presence
                 .opacity(
-                    gameViewModel.areMoveSelectionButtonsDisabled && gameViewModel.selectedTargetMove != move
+                    (gameViewModel.areMoveSelectionButtonsDisabled && gameViewModel.selectedTargetMove != move) || !rtcViewModel.hasRemoteUser
                     ? 0.45
                     : 1
                 )
