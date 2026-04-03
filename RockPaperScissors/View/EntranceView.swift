@@ -116,7 +116,7 @@ struct EntranceView: View {
 }
 
 func bearImage(height: CGFloat = 32) -> some View {
-    Image("bear_")
+    Image("bear_icon")
         .resizable()
         .scaledToFit()
         .frame(width: height, height: height)
@@ -124,7 +124,7 @@ func bearImage(height: CGFloat = 32) -> some View {
 }
 
 func humanImage(height: CGFloat = 32) -> some View {
-    Image("daughter_")
+    Image("daughter_icon")
         .resizable()
         .scaledToFit()
         .frame(width: height, height: height)

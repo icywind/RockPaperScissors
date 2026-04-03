@@ -82,3 +82,10 @@ struct ConfettiPiece: View {
             .rotationEffect(.degrees(currentRotation))
     }
 }
+#Preview {
+    ZStack {
+        Color.black.ignoresSafeArea()
+        ConfettiView(isAnimating: true)
+    }
+}
+

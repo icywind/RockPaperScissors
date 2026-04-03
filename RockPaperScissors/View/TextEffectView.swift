@@ -17,6 +17,9 @@ struct TextEffectView: View {
                 Text(showText)
                     .font(.system(size: 80, weight: .bold))
                     .foregroundStyle(.white)
+                    .lineLimit(1) // Constrain text to a single line
+                    .minimumScaleFactor(0.1) // Allow text to shrink if it's too long
+                    .padding(.horizontal) // Add horizontal padding to prevent text from touching edges
                     .scaleEffect(scale)
                     .opacity(opacity)
             }
@@ -62,4 +65,3 @@ struct TextEffectView: View {
 #Preview {
     TextEffectView(showText: "WINNER!", isShowing: true)
 }
-

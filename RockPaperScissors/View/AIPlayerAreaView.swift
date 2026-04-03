@@ -1,5 +1,4 @@
 import SwiftUI
-let petName = "bear"
 
 struct AIPlayerAreaView: View {
     let move: HandMove?

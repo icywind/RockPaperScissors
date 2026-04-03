@@ -7,6 +7,8 @@
 import SwiftUI
 import Combine
 
+let petName = "bear"
+
 class Settings: ObservableObject {
     static let shared = Settings()
     @AppStorage("isAutoMode") var isAutoMode: Bool = false

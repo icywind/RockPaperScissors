@@ -125,14 +125,7 @@ struct BvsP1View: View {
     // MARK: - Helper Functions
     
     private func bearImageName(for move: HandMove) -> String {
-        switch move {
-        case .rock:
-            return "bear-rock"
-        case .paper:
-            return "bear-paper"
-        case .scissors:
-            return "bear-scissors"
-        }
+        "\(petName)-\(move.imageName)"
     }
     
     private func handMoveButtonsView() -> some View {
