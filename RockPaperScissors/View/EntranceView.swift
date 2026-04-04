@@ -9,6 +9,7 @@ import SwiftUI
 
 struct EntranceView: View {
     @AppStorage("roomName") private var roomName: String = ""
+    @ObservedObject private var settings = Settings.shared
     @State private var showInvalidRoomAlert = false
     @State private var navigateToAI = false
     @State private var navigateToBear = false
@@ -34,6 +35,19 @@ struct EntranceView: View {
                 }
                 
                 Spacer()
+                
+                Spacer()
+                
+                // Player Name Input
+                VStack(spacing: 12) {
+                    Text("Your Name")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                    
+                    TextField("Enter your name", text: $settings.username)
+                        .textFieldStyle(.roundedBorder)
+                        .padding(.horizontal, 32)
+                }
                 
                 // Room Input
                 VStack(spacing: 12) {
@@ -111,7 +125,20 @@ struct EntranceView: View {
             } message: {
                 Text("Room name must be at least 3 characters long.")
             }
+            .onAppear {
+                if settings.username.isEmpty {
+                    settings.username = generateCuteName()
+                }
+            }
         }
+    }
+    
+    private func generateCuteName() -> String {
+        let adjectives = ["Fluffy", "Happy", "Sleepy", "Brave", "Clever", "Silly", "Chubby", "Tiny", "Sparkly", "Bouncy"]
+        let animals = ["Bear", "Cat", "Puppy", "Bunny", "Panda", "Fox", "Koala", "Penguin", "Tiger", "Duck"]
+        let randomAdjective = adjectives.randomElement() ?? "Cute"
+        let randomAnimal = animals.randomElement() ?? "Pet"
+        return "\(randomAdjective) \(randomAnimal)"
     }
 }
 

@@ -2,6 +2,7 @@ import SwiftUI
 import AVFoundation
 
 struct PlayerCameraAreaView: View {
+    @ObservedObject private var settings = Settings.shared
     @ObservedObject var viewModel: PlayerCameraViewModel
     let player1Outcome: Player1Outcome?
     @State private var showSaveAlert = false
@@ -11,7 +12,7 @@ struct PlayerCameraAreaView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Player 1")
+                Text(settings.username.isEmpty ? "Player 1" : settings.username)
                     .font(.title3.weight(.semibold))
                     .frame(maxWidth: .infinity, alignment: .trailing)
                 Text("Front camera hand gesture recognition")

@@ -6,9 +6,14 @@
 //
 import Foundation
 
-struct NetworkMessage : Codable, Identifiable {
+struct GameMessage : Codable, Identifiable {
     var id = UUID()
     let requiredP1Mode :  PlayerType
     let remoteP2Mode : PlayerType
     let remoteP2Move : HandMove?
+}
+
+struct NameMessage: Codable, Identifiable {
+    var id = UUID()
+    let playerName: String
 }

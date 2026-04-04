@@ -265,7 +265,7 @@ final class GameViewModel: ObservableObject {
             playerTwoMove: selectedTargetMove
         )
         player2Move = outcome.playerTwoMove
-        resultText = outcome.resultText
+        resultText = formattedResultText(outcome.resultText)
         selectedTargetMove = nil
         shufflingMove = nil
         
@@ -306,7 +306,7 @@ final class GameViewModel: ObservableObject {
     
     // MARK: - Network Gameplay
     
-    func handleNetworkMessage(_ message: NetworkMessage) {
+    func handleGameMessage(_ message: GameMessage) {
         // Verify that Player1 is human (local player)
         guard message.requiredP1Mode == .human else {
             print("Received message but Player1 is not human: \(message.requiredP1Mode)")
@@ -346,7 +346,7 @@ final class GameViewModel: ObservableObject {
 //            return
 //        }
         
-        let responseMessage = NetworkMessage(
+        let responseMessage = GameMessage(
             requiredP1Mode: .human,
             remoteP2Mode: .buttonpusher,
             remoteP2Move: playerCameraViewModel.recognizedMove
@@ -361,7 +361,7 @@ final class GameViewModel: ObservableObject {
     func updateResultFromNetwork(player2Move: HandMove?, resultText: String) {
         stopShuffleTimer()
         self.player2Move = player2Move
-        self.resultText = resultText
+        self.resultText = formattedResultText(resultText)
         selectedTargetMove = nil
         shufflingMove = nil
         
@@ -373,6 +373,19 @@ final class GameViewModel: ObservableObject {
         } else if resultText.contains("tie") {
             player1Outcome = .tie
         }
+    }
+    
+    private func formattedResultText(_ originalText: String) -> String {
+        let savedName = Settings.shared.username
+        let playerName = savedName.isEmpty ? "Player 1" : savedName
+        var finalResultText = originalText
+        if gameController.playerOneType == .human {
+            finalResultText = finalResultText.replacingOccurrences(of: "Player 1", with: playerName)
+        } else if gameController.playerOneType == .buttonpusher {
+            finalResultText = finalResultText.replacingOccurrences(of: "Player 2 (AI)", with: playerName)
+            finalResultText = finalResultText.replacingOccurrences(of: "Player 2", with: playerName)
+        }
+        return finalResultText
     }
 }
 

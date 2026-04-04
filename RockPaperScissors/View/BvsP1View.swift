@@ -20,9 +20,9 @@ struct BvsP1View: View {
     @State private var showAlertMessage: Bool = false
     
     // MARK: - struct init
-    init(roomName: String) {
+    init(roomName: String, rtcViewModel: AgoraViewModel? = nil) {
         self.roomName = roomName
-        let rtcVM = AgoraViewModel(channelName: roomName)
+        let rtcVM = rtcViewModel ?? AgoraViewModel(channelName: roomName)
         _rtcViewModel = StateObject(wrappedValue: rtcVM)
         _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .buttonpusher, player2Type: .human, rtcViewModel: rtcVM))
     }
@@ -32,7 +32,7 @@ struct BvsP1View: View {
             VStack(spacing: 12) {
                 ZStack(alignment: .bottomTrailing) {
                     Player2ContainerView(
-                        player2Name: "Player 1",
+                        player2Name: rtcViewModel.remotePlayerName ?? "????",
                         player2Description: "Remote user",
                         subView:
                             VideoContainerView(uiView: remoteUIView)
@@ -90,7 +90,11 @@ struct BvsP1View: View {
             }
         }
         .onChange(of: rtcViewModel.hasRemoteUser) { hasRemoteUser in
-            if !hasRemoteUser && gameViewModel.isShuffling {
+            if hasRemoteUser {
+                let savedName = Settings.shared.username
+                let myName = savedName.isEmpty ? "Player 2" : savedName
+                rtcViewModel.sendNameMessage(playerName: myName)
+            } else if gameViewModel.isShuffling {
                 // stop the game
                 gameViewModel.resetGame()
                 alertMessage = "Opponent left the game :("
@@ -133,7 +137,7 @@ struct BvsP1View: View {
             ForEach(HandMove.allCases, id: \.rawValue) { move in
                 Button(action: {
                     gameViewModel.startGame(with: move)
-                    let msg = NetworkMessage(
+                    let msg = GameMessage(
                         requiredP1Mode: .human,
                         remoteP2Mode: .buttonpusher,
                         remoteP2Move: move
@@ -175,7 +179,7 @@ struct BvsP1View: View {
             isLoading = false
         }
         // Set up network message handler to receive Player1's move
-        rtcViewModel.onNetworkMessageReceived = { message in
+        rtcViewModel.onGameMessageReceived = { message in
             // In BvsP1View, we receive the Player1's move back
             // Determine the game result using the remote player's move
             print("Received Player1's move: \(message.remoteP2Move, default: "unknown")")
@@ -205,5 +209,9 @@ struct BvsP1View: View {
 }
 
 #Preview {
-    BvsP1View(roomName: "preview-room")
+    let previewRtcViewModel = AgoraViewModel(channelName: "preview-room")
+    previewRtcViewModel.remotePlayerName = "Preview Player"
+    previewRtcViewModel.hasRemoteUser = true
+
+    return BvsP1View(roomName: "preview-room", rtcViewModel: previewRtcViewModel)
 }

@@ -18,6 +18,7 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
     @Published var isJoined: Bool = false
     @Published var isEngineCreated: Bool = false
     @Published var hasRemoteUser: Bool = false
+    @Published var remotePlayerName: String?
     
     private var agoraKit: AgoraRtcEngineKit!
     private var remoteView: VideoUIView?
@@ -27,8 +28,8 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
     
     var simulatorVideoTimer: Timer?
     
-    // Callback for handling received NetworkMessage
-    var onNetworkMessageReceived: ((NetworkMessage) -> Void)?
+    // Callback for handling received GameMessage
+    var onGameMessageReceived: ((GameMessage) -> Void)?
     
     private init(channelName: String = "rockgame") {
         self.channelName = channelName
@@ -129,6 +130,7 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
             }
             isJoined = false
         }
+        hasRemoteUser = false
         AgoraRtcEngineKit.destroy()
         print("Agora engine destroyed!")
     }
@@ -145,7 +147,7 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
         agoraKit.pushExternalVideoFrame(videoFrame, videoTrackId: 0)
     }
     
-    func sendMessage(message: NetworkMessage) {
+    func sendMessage(message: GameMessage) {
         let encoder = JSONEncoder()
         let json = try? encoder.encode(message)
         guard let json else { return }
@@ -154,6 +156,12 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
         if sendResult != 0 {
             print("send message failed, error = \(sendResult)")
         }
+    }
+    
+    func sendNameMessage(playerName: String) {
+        let msg = NameMessage(playerName: playerName)
+        guard let json = try? JSONEncoder().encode(msg) else { return }
+        agoraKit.sendStreamMessage(streamId, data: json)
     }
     
     func sendWords(message: String) {
@@ -211,6 +219,9 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
         if activeRemoteUserUid == uid {
             activeRemoteUserUid = nil
             hasRemoteUser = false
+            DispatchQueue.main.async {
+                self.remotePlayerName = nil
+            }
         }
         
         let videoCanvas = AgoraRtcVideoCanvas()
@@ -226,11 +237,15 @@ final class AgoraRtcController: NSObject, AgoraRtcEngineDelegate {
         print(message)
         
         if uid == activeRemoteUserUid {
-            if let msg = try? JSONDecoder().decode(NetworkMessage.self, from: data) {
+            if let msg = try? JSONDecoder().decode(GameMessage.self, from: data) {
                 print("msg.move: \(msg.remoteP2Move, default: "unrecognized")")
-                onNetworkMessageReceived?(msg)
+                onGameMessageReceived?(msg)
+            } else if let nameMsg = try? JSONDecoder().decode(NameMessage.self, from: data) {
+                print("Received name: \(nameMsg.playerName)")
+                DispatchQueue.main.async {
+                    self.remotePlayerName = nameMsg.playerName
+                }
             }
         }
     }
 }
-

@@ -17,9 +17,9 @@ struct P1vsBView: View {
     @State private var remoteUIView = UIView()
     
     // MARK: - struct init
-    init(roomName: String) {
+    init(roomName: String, rtcViewModel: AgoraViewModel? = nil) {
         self.roomName = roomName
-        let rtcVM = AgoraViewModel(channelName: roomName)
+        let rtcVM = rtcViewModel ?? AgoraViewModel(channelName: roomName)
         _rtcViewModel = StateObject(wrappedValue: rtcVM)
         _gameViewModel = StateObject(wrappedValue: GameViewModel(player1Type: .human, player2Type: .buttonpusher, rtcViewModel: rtcVM))
     }
@@ -38,7 +38,7 @@ struct P1vsBView: View {
                 // ResultBoxView(resultText: "\(rtcViewModel.message)")
 
                 Player2ContainerView(
-                    player2Name: "Player 2",
+                    player2Name: rtcViewModel.remotePlayerName ?? "????",
                     player2Description: "Remote user",
                     subView:
                         HStack(spacing: 6) {
@@ -78,10 +78,10 @@ struct P1vsBView: View {
                 isLoading = false
             }
             // Set up network message handler
-            rtcViewModel.onNetworkMessageReceived = { message in
+            rtcViewModel.onGameMessageReceived = { message in
                 // Handle the network message from Player2
                 // This will start shuffling in AIPlayerAreaView
-                gameViewModel.handleNetworkMessage(message)
+                gameViewModel.handleGameMessage(message)
             }
         }
         .onDisappear {
@@ -94,7 +94,11 @@ struct P1vsBView: View {
             }
         }
         .onChange(of: rtcViewModel.hasRemoteUser) { newValue in
-            if !newValue {
+            if newValue {
+                let savedName = Settings.shared.username
+                let myName = savedName.isEmpty ? "Player 1" : savedName
+                rtcViewModel.sendNameMessage(playerName: myName)
+            } else {
                 // user gone offline
                 print("Restarting camera ..... ")
                 gameViewModel.playerCameraViewModel.restartSession()
@@ -120,5 +124,8 @@ struct P1vsBView: View {
 }
 
 #Preview {
-    P1vsBView(roomName: "preview-room")
+    let previewRtcViewModel = AgoraViewModel(channelName: "preview-room")
+    previewRtcViewModel.hasRemoteUser = false
+    
+    return P1vsBView(roomName: "preview-room", rtcViewModel: previewRtcViewModel)
 }

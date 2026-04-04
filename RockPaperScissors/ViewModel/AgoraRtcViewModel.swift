@@ -11,18 +11,19 @@ import Combine
 import AgoraRtcKit
 
 class AgoraViewModel: ObservableObject {
-    @Published private(set) var message: String = "Hello, World!"
-    @Published private(set) var isJoined: Bool = false
-    @Published private(set) var isEngineCreated: Bool = false
-    @Published private(set) var hasRemoteUser: Bool = false
+    @Published var message: String = "Hello, World!"
+    @Published var isJoined: Bool = false
+    @Published var isEngineCreated: Bool = false
+    @Published var hasRemoteUser: Bool = false
+    @Published var remotePlayerName: String?
 
     private let rtcController = AgoraRtcController.shared
     private var channelName: String
     
-    // Callback for handling received NetworkMessage
-    var onNetworkMessageReceived: ((NetworkMessage) -> Void)? {
+    // Callback for handling received GameMessage
+    var onGameMessageReceived: ((GameMessage) -> Void)? {
         didSet {
-            rtcController.onNetworkMessageReceived = onNetworkMessageReceived
+            rtcController.onGameMessageReceived = onGameMessageReceived
         }
     }
     
@@ -41,6 +42,7 @@ class AgoraViewModel: ObservableObject {
         rtcController.$isEngineCreated
             .assign(to: &$isEngineCreated)
         rtcController.$hasRemoteUser.assign(to: &$hasRemoteUser)
+        rtcController.$remotePlayerName.assign(to: &$remotePlayerName)
     }
     
     func onAppear(remoteView: VideoUIView?) {
@@ -55,8 +57,11 @@ class AgoraViewModel: ObservableObject {
         rtcController.pushVideoFrame(pixelBuffer: pixelBuffer)
     }
     
-    func sendMessage(message: NetworkMessage) {
+    func sendMessage(message: GameMessage) {
         rtcController.sendMessage(message: message)
     }
+    
+    func sendNameMessage(playerName: String) {
+        rtcController.sendNameMessage(playerName: playerName)
+    }
 }
-
