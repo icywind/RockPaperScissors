@@ -4,6 +4,21 @@
 [![iOS](https://img.shields.io/badge/iOS-17%2B-blue.svg)](https://developer.apple.com/ios/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+<p align="Left">
+  <img src="Resources/appstore.png" alt="AppStore Icon" style="max-width:40%; height:auto;">
+</p>
+## 🎮 Player Modes
+
+**Three exciting play modes accessible from EntranceView:**
+
+- **P1vsAI**: Player 1 uses hand gestures (camera) vs local AI opponent (random moves).
+- **P1vsB**: Player 1 uses hand gestures vs remote **Bear** player (button inputs over RTC).
+- **BvsP1**: Local **Bear** (button selector) vs remote Player 1 (gestures over RTC).
+
+**B (Bear)** represents a player who simply presses buttons to choose Rock/Paper/Scissors instead of performing finger gestures.
+
+**Real-time multiplayer powered by fully implemented RTC (Agora SDK)!**
+
 A real-time **Rock Paper Scissors** game built with **SwiftUI** and **Core ML** for iOS. Play against an AI opponent using your **hand gestures** captured by the front-facing camera—no taps required!
 
 ## 🎮 Overview
@@ -15,6 +30,8 @@ Detects **Rock**, **Paper**, or **Scissors** hand poses in real-time using a tra
 
 ## ✨ Features
 
+- **Three Player Modes**: P1vsAI, P1vsB, BvsP1 (local AI or remote RTC multiplayer)
+- **Real-Time Communication (RTC)**: Fully implemented with Agora SDK for remote play
 - **Real-time Hand Pose Recognition** via `RockPaperScissorClassifier.mlmodel` and `AVCaptureSession`
 - **Camera Permissions & Error Handling** (front camera only)
 - **3-Second Countdown Timer** on first detected gesture
@@ -71,7 +88,7 @@ RockPaperScissors/
 
 ## 🚀 Future Roadmap
 
-- **Real-Time Communication (RTC)**: Multiplayer over WebRTC for remote players
+- **✅ Real-Time Communication (RTC)**: Fully implemented with Agora SDK
 - **Advanced AI Player**: Smarter opponent (learn from user patterns, difficulty levels)
 - **Custom Gestures & Themes**
 - **Game Stats & Leaderboards**

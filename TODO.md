@@ -1,10 +1,9 @@
-# Implement resetGame() in GameViewModel
+# README Update Plan Progress
 
 ## Steps:
-1. [DONE] Create this TODO.md
-2. [DONE] Edit RockPaperScissors/ViewModel/GameViewModel.swift - implement resetGame(): stopShuffleTimer(), reset states (player2Move=nil, player1Outcome=nil, resultText=initial, selectedTargetMove=nil, shufflingMove=nil)
-3. [DONE] Test: Run P1vsB/BvsP1, start game/shuffle, trigger resetGame() (e.g., hasRemoteUser=false), verify stop shuffling, reset UI, no crash
-4. [DONE] Use attempt_completion
+- [x] 1. Gather file info and search code for modes (P1vsAI, P1vsB, BvsP1 confirmed)
+- [x] 2. Create detailed edit plan and get user approval
+- [x] 3. Create this TODO.md
+- [x] 4. Edit README.md (insert image, add mode explanations, update RTC note)
+- [x] 5. Verify and mark complete
 
-## Progress
-- Current: Starting Step 1
