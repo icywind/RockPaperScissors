@@ -66,13 +66,33 @@ Detects **Rock**, **Paper**, or **Scissors** hand poses in real-time using a tra
    open RockPaperScissors.xcodeproj
    ```
 
-3. Select an **iOS Simulator** with camera support (iPhone 15 Pro or later recommended) or **physical device**.
+3. Select a physical device or an **iOS Simulator** with camera support.
 
 4. **Build & Run** (⌘R)
 
 5. **Grant Camera Permission** when prompted.
 
 **Requirements:** iOS 17+, Xcode 15+
+
+### 🔑 Realtime Multiplayer Setup
+
+To enable the Realtime two player mode (P1vsB / BvsP1 modes), you need to configure the `Secrets.xcconfig` file:
+
+1. Copy the provided template file:
+   ```
+   # The repository includes Secrets.xcconfig template
+   ```
+
+2. Edit `Secrets.xcconfig` and add your values:
+   ```xcconfig
+   // Get App ID from https://console.agora.io/
+   AGORA_APP_ID = your_agora_app_id_here
+
+   // Optional: Token server URL for production usage
+   AGORA_TOKEN_SERVER_URL = https://your-token-server.example.com
+   ```
+
+> ⚠️ Without these values configured, the Realtime multiplayer modes will not work. You can still use the local P1vsAI mode without any secrets configuration.
 
 ## 🏗️ Project Structure
 

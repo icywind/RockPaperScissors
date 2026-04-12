@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3636AB492F8B2D8A00F2AD32 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3636AB482F8B2D8A00F2AD32 /* Secrets.xcconfig */; };
 		366030332F6DF57500DECAE6 /* RtcBasic in Frameworks */ = {isa = PBXBuildFile; productRef = 366030322F6DF57500DECAE6 /* RtcBasic */; };
 /* End PBXBuildFile section */
 
@@ -21,13 +22,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3636AB482F8B2D8A00F2AD32 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		36614B1F2F5EA3D200F434BE /* RockPaperScissors.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RockPaperScissors.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36614B2D2F5F2B0A00F434BE /* RockPaperScissorsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RockPaperScissorsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3636AB472F8B275E00F2AD32 /* Exceptions for "RockPaperScissors" folder in "RockPaperScissors" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 36614B1E2F5EA3D200F434BE /* RockPaperScissors */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		36614B212F5EA3D200F434BE /* RockPaperScissors */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3636AB472F8B275E00F2AD32 /* Exceptions for "RockPaperScissors" folder in "RockPaperScissors" target */,
+			);
 			path = RockPaperScissors;
 			sourceTree = "<group>";
 		};
@@ -71,6 +86,7 @@
 				36614B2E2F5F2B0A00F434BE /* RockPaperScissorsTests */,
 				366030312F6DF57500DECAE6 /* Frameworks */,
 				36614B202F5EA3D200F434BE /* Products */,
+				3636AB482F8B2D8A00F2AD32 /* Secrets.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -179,6 +195,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3636AB492F8B2D8A00F2AD32 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +236,7 @@
 /* Begin XCBuildConfiguration section */
 		36614B282F5EA3D400F434BE /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3636AB482F8B2D8A00F2AD32 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -283,6 +301,7 @@
 		};
 		36614B292F5EA3D400F434BE /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3636AB482F8B2D8A00F2AD32 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -340,6 +359,7 @@
 		};
 		36614B2B2F5EA3D400F434BE /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3636AB482F8B2D8A00F2AD32 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -348,6 +368,7 @@
 				DEVELOPMENT_TEAM = XQ9J2D9T83;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RockPaperScissors/Info.plist;
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Use bluetooth audio input/output";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to recognize rock, paper, and scissors hand gestures in real time.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Voice chat";
@@ -377,6 +398,7 @@
 		};
 		36614B2C2F5EA3D400F434BE /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3636AB482F8B2D8A00F2AD32 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -385,6 +407,7 @@
 				DEVELOPMENT_TEAM = XQ9J2D9T83;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RockPaperScissors/Info.plist;
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Use bluetooth audio input/output";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to recognize rock, paper, and scissors hand gestures in real time.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Voice chat";

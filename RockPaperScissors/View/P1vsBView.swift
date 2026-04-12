@@ -70,6 +70,8 @@ struct P1vsBView: View {
             }
         }
         .onAppear {
+            assert(!Secrets.agoraAppId.isEmpty, "Agora App ID is not configured! Please set AGORA_APP_ID in Secrets.xcconfig to use Realtime multiplayer modes.")
+            assert(!Secrets.tokenServerURL.isEmpty || Secrets.agoraAppId.contains("#"), "Token server URL not configured. For production usage set AGORA_TOKEN_SERVER_URL in Secrets.xcconfig.")
             Task {
                 isLoading = true
                 rtcViewModel.onAppear(remoteView: remoteUIView)
